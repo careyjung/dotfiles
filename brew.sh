@@ -43,6 +43,8 @@ brew install openssh
 brew install screen
 brew install homebrew/php/php56 --with-gmp
 
+exit 0
+
 # Install font tools.
 brew tap bramstein/webfonttools
 brew install sfnt2woff
