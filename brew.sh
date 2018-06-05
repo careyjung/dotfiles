@@ -43,6 +43,9 @@ brew install openssh
 brew install screen
 brew install homebrew/php/php56 --with-gmp
 
+#
+# that's it for now
+#
 exit 0
 
 # Install font tools.
