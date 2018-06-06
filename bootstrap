@@ -1,0 +1,168 @@
+#!/usr/bin/env bash
+
+DOTFILES=(
+    .aliases
+    .bash_logout
+    .bash_profile
+    .bash_prompt
+    .bashrc
+    .curlrc
+    .editorconfig
+    .emacs.d
+    .exports
+    .functions
+    .gdbinit
+    .gitattributes
+    .gitconfig
+    .gitignore
+    .gvimrc
+    .hgignore
+    .hushlogin
+    .inputrc
+    .profile
+    .screenrc
+    .ssh
+    .tmux.conf
+    .vim
+    .vimrc
+    .wgetrc
+)
+
+UTILS=(
+    coreutils
+    moreutils
+    gnu-sed
+    gnu-tar
+    gnu-indent
+    gnu-which
+    grep
+    findutils
+)
+
+BREWAPPS=(
+    python
+    python2
+)
+
+CASKAPPS=(
+    google-chrome
+    google-backup-and-sync
+    emacs
+    sketchup-pro
+    whatsapp
+)
+
+
+function install_brew() {
+    echo "Installing/updating brew..."
+    
+    if [ ! `which brew` ]; then
+        /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+    fi
+    brew update
+    brew upgrade
+}
+
+function install_utils() {
+    echo Installing utils...
+    for pkg in ${UTILS[@]}; do
+        brew install $pkg --with-default-names
+    done
+}
+
+function install_bash() {
+    echo Installing bash and bash-completion2...
+    brew install bash bash-completion2
+    if ! fgrep -q '/usr/local/bin/bash' /etc/shells; then
+        echo '/usr/local/bin/bash' | sudo tee -a /etc/shells
+        chsh -s /usr/local/bin/bash;
+    fi
+}
+
+function install_dotfiles() {
+    echo Installing dotfiles: ${DOTFILES[@]}
+    rsync -avh --no-perms ${DOTFILES[@]} ~
+    (cd ~; source ~/.bash_profile)
+}
+
+function install_brewapps() {
+    echo Installing brew apps: ${BREWAPPS[@]}
+    brew install ${BREWAPPS[@]}
+}
+
+function install_caskapps() {
+    echo Installing brew cask apps: ${CASKAPPS[@]}
+    for app in ${CASKAPPS[@]}; do
+        brew cask install $app
+    done
+}
+
+function install_prefs() {
+    echo Installing system preferences...
+
+    rsync -avh com.apple.Terminal.plist ~/Library/Preferences
+    defaults read com.apple.Terminal>/dev/null # force Terminal to flush its plist cache
+
+    # Dock Preferences
+    # Hot corners:
+    #  0: no-op
+    #  2: Mission Control
+    #  3: Show application windows
+    #  4: Desktop
+    #  5: Start screen saver
+    #  6: Disable screen saver
+    #  7: Dashboard
+    # 10: Put display to sleep
+    # 11: Launchpad
+    # 12: Notification Center
+    # 'tr' = top right, 'br' = bottom right, etc.
+    defaults write com.apple.dock autohide -bool true
+    defaults write com.apple.dock wvous-tr-corner -int 2
+    defaults write com.apple.dock wvous-tr-modifier -int 0
+    defaults write com.apple.dock wvous-br-corner -int 10
+    defaults write com.apple.dock wvous-br-modifier -int 0
+    defaults write com.apple.dock wvous-bl-corner -int 4
+    defaults write com.apple.dock wvous-bl-modifier -int 0			
+    defaults write com.apple.dock minimize-to-application -bool true
+    killall Dock
+
+    # Finder Preferences:
+    # - hide files from Desktop
+    # - add Quit menu item: ⌘ + Q will also hide desktop icons
+    defaults write com.apple.finder CreateDesktop false
+    defaults write com.apple.finder QuitMenuItem -bool true
+    killall Finder
+
+    # nvram Preferences:
+    # - silent boot (unreliable)
+    sudo nvram SystemAudioVolume=" "
+    
+    # screensaver prefs
+    defaults write com.apple.screensaver askForPassword -int 1
+    defaults write com.apple.screensaver askForPasswordDelay 1200
+    defaults write com.apple.screensaver idleTime 120
+    defaults read com.apple.screensaver >/dev/null
+    osascript -e 'tell application "System Preferences" to quit'
+
+
+    # Device Preferences
+    defaults write NSGlobalDomain KeyRepeat -int 2				# fast repeat
+    defaults write NSGlobalDomain InitialKeyRepeat -int 15			# no delay
+    defaults write NSGlobalDomain com.apple.trackpad.scaling -int 3		# fast tracking
+    defaults write com.apple.driver.AppleBluetoothMultitouch.trackpad Clicking -bool true # tap to click
+    defaults -currentHost write NSGlobalDomain com.apple.mouse.tapBehavior -int 1
+}
+
+
+CALLS=(brew utils bash dotfiles brewaapps caskapps prefs)
+
+if [ $# -gt 0 ]; then
+    CALLS=()
+    CALLS=$@
+fi
+
+for call in ${CALLS[@]}; do
+    install_${call}
+done
+
+exit 0
