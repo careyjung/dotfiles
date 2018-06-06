@@ -37,6 +37,7 @@ UTILS=(
     gnu-which
     grep
     findutils
+    gnupg
 )
 
 BREWAPPS=(
