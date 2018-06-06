@@ -47,13 +47,44 @@ BREWAPPS=(
 CASKAPPS=(
     google-chrome
     google-backup-and-sync
+    marshallofsound-google-play-music-player
     emacs
     sketchup-pro
     whatsapp
 )
 
+revoke_sudo () {
+    echo -n Revoking sudo privileges....
+    sudo -- sh -c \
+           "rm -f /etc/sudoers.d/wheel; dscl /Local/Default -delete /Groups/wheel GroupMembership $(whoami)"
+    echo Log out then back in for changes to take effect
+}
 
-function install_brew() {
+grant_sudo() {
+    echo Granting sudo privileges....
+
+    trap revoke_sudo EXIT
+
+    printf "%s\n" "%wheel ALL=(ALL) NOPASSWD: ALL" | \
+        sudo tee "/etc/sudoers.d/wheel" > /dev/null && \
+        sudo dscl /Local/Default append /Groups/wheel GroupMembership "$(whoami)"
+}
+
+do_ssh() {
+    ssh-keygen
+    eval $(ssh-agent -s)
+#    ssh-add
+}
+
+function do_repo() {
+    cd ~
+    softwareupdate --install --all
+    xcode-select --install
+    git clone git@github.com:careyjung/dotfiles.git
+    ssh-keygen
+}
+
+function do_brew() {
     echo "Installing/updating brew..."
     
     if [ ! `which brew` ]; then
@@ -63,14 +94,14 @@ function install_brew() {
     brew upgrade
 }
 
-function install_utils() {
+function do_utils() {
     echo Installing utils...
     for pkg in ${UTILS[@]}; do
         brew install $pkg --with-default-names
     done
 }
 
-function install_bash() {
+function do_bash() {
     echo Installing bash and bash-completion2...
     brew install bash bash-completion2
     if ! fgrep -q '/usr/local/bin/bash' /etc/shells; then
@@ -79,29 +110,26 @@ function install_bash() {
     fi
 }
 
-function install_dotfiles() {
+function do_dotfiles() {
     echo Installing dotfiles: ${DOTFILES[@]}
     rsync -avh --no-perms ${DOTFILES[@]} ~
     (cd ~; source ~/.bash_profile)
 }
 
-function install_brewapps() {
+function do_brewapps() {
     echo Installing brew apps: ${BREWAPPS[@]}
     brew install ${BREWAPPS[@]}
 }
 
-function install_caskapps() {
+function do_caskapps() {
     echo Installing brew cask apps: ${CASKAPPS[@]}
     for app in ${CASKAPPS[@]}; do
         brew cask install $app
     done
 }
 
-function install_prefs() {
+function do_system() {
     echo Installing system preferences...
-
-    rsync -avh com.apple.Terminal.plist ~/Library/Preferences
-    defaults read com.apple.Terminal>/dev/null # force Terminal to flush its plist cache
 
     # Dock Preferences
     # Hot corners:
@@ -153,16 +181,29 @@ function install_prefs() {
     defaults -currentHost write NSGlobalDomain com.apple.mouse.tapBehavior -int 1
 }
 
+function do_terminal() {
+    echo Installing Terminal preferences...
 
-CALLS=(brew utils bash dotfiles brewaapps caskapps prefs)
+    cp init/com.apple.Terminal.plist ~/Library/Preferences
+
+    # Force Terminal to flush its cache (supposedly)
+    defaults read com.apple.Terminal>/dev/null 
+}
+
+
+CALLS=(ssh brew utils bash dotfiles brewapps caskapps system terminal)
 
 if [ $# -gt 0 ]; then
     CALLS=()
     CALLS=$@
 fi
 
+grant_sudo # revoked on exit
+
+setup_ssh
+
 for call in ${CALLS[@]}; do
-    install_${call}
+    do_${call}
 done
 
 exit 0
