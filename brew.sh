@@ -21,6 +21,9 @@ brew install findutils --with-default-names
 # Install GNU `sed`, overwriting the built-in `sed`.
 brew install gnu-sed --with-default-names
 
+# Install GNU `make`, overwriting the built-in `make`.
+brew install make --with-default-names
+
 # Install Bash 4.
 # Note: don’t forget to add `/usr/local/bin/bash` to `/etc/shells` before
 # running `chsh`.
