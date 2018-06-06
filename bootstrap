@@ -72,9 +72,11 @@ grant_sudo() {
 }
 
 do_ssh() {
-    ssh-keygen
-    eval $(ssh-agent -s)
-#    ssh-add
+    if [ ! -f ~/.ssh/id_rsa ]; then
+        ssh-keygen
+        eval $(ssh-agent -s)
+        #    ssh-add
+    fi
 }
 
 function do_repo() {
@@ -132,6 +134,29 @@ function do_caskapps() {
 function do_system() {
     echo Installing system preferences...
 
+    # nvram Preferences:
+    # - silent boot (unreliable)
+    sudo nvram SystemAudioVolume=" "
+    
+    # screensaver prefs
+    defaults write com.apple.screensaver askForPassword -int 1
+    defaults write com.apple.screensaver askForPasswordDelay 1200
+    defaults write com.apple.screensaver idleTime 120
+    defaults read com.apple.screensaver >/dev/null
+    osascript -e 'tell application "System Preferences" to quit'
+
+
+    # Device Preferences
+    defaults write NSGlobalDomain KeyRepeat -int 2				# fast repeat
+    defaults write NSGlobalDomain InitialKeyRepeat -int 15			# no delay
+    defaults write NSGlobalDomain com.apple.trackpad.scaling -int 3		# fast tracking
+    defaults write com.apple.driver.AppleBluetoothMultitouch.trackpad Clicking -bool true # tap to click
+    defaults -currentHost write NSGlobalDomain com.apple.mouse.tapBehavior -int 1
+}
+
+function do_desktop() {
+    echo Setting screen preferences...
+
     # Dock Preferences
     # Hot corners:
     #  0: no-op
@@ -162,24 +187,7 @@ function do_system() {
     defaults write com.apple.finder QuitMenuItem -bool true
     killall Finder
 
-    # nvram Preferences:
-    # - silent boot (unreliable)
-    sudo nvram SystemAudioVolume=" "
-    
-    # screensaver prefs
-    defaults write com.apple.screensaver askForPassword -int 1
-    defaults write com.apple.screensaver askForPasswordDelay 1200
-    defaults write com.apple.screensaver idleTime 120
-    defaults read com.apple.screensaver >/dev/null
-    osascript -e 'tell application "System Preferences" to quit'
-
-
-    # Device Preferences
-    defaults write NSGlobalDomain KeyRepeat -int 2				# fast repeat
-    defaults write NSGlobalDomain InitialKeyRepeat -int 15			# no delay
-    defaults write NSGlobalDomain com.apple.trackpad.scaling -int 3		# fast tracking
-    defaults write com.apple.driver.AppleBluetoothMultitouch.trackpad Clicking -bool true # tap to click
-    defaults -currentHost write NSGlobalDomain com.apple.mouse.tapBehavior -int 1
+    osascript -e 'tell application "Finder" to set desktop picture to POSIX file "/Users/carey/Documents/Still Lake With Goose.jpeg"'
 }
 
 function do_terminal() {
@@ -192,16 +200,14 @@ function do_terminal() {
 }
 
 
-CALLS=(ssh brew utils bash dotfiles brewapps caskapps system terminal)
+CALLS=(ssh brew utils bash dotfiles brewapps caskapps system desktop terminal)
 
 if [ $# -gt 0 ]; then
-    CALLS=()
+    unset CALLS
     CALLS=$@
 fi
 
 grant_sudo # revoked on exit
-
-setup_ssh
 
 for call in ${CALLS[@]}; do
     do_${call}
