@@ -47,7 +47,6 @@ BREWAPPS=(
 
 CASKAPPS=(
     google-chrome
-    google-backup-and-sync
     marshallofsound-google-play-music-player
     emacs
     sketchup-pro
