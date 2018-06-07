@@ -239,8 +239,11 @@ cd `dirname $0`
 for call in ${CALLS[@]}; do
     echo Setting up ${call}
     setup_${call}
-    read -p "Done setting up ${call}.
+    if [ $interactive ]; then
+        read -p "Done setting up ${call}.
 Press any key to continue... "
+    else
+        echo Done setting up ${call}.
 done
 
 exit 0
