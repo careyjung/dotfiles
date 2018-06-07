@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 
-GITURL="git@github.com:careyjung/dotfiles.git"
+CALLS=(sudo dotfiles brew bash ssh repo brewapps caskapps system desktop terminal)
+
+REPO="git@github.com:careyjung/dotfiles.git"
 
 DOTFILES=(
     .aliases
@@ -30,9 +32,10 @@ DOTFILES=(
     .wgetrc
 )
 
-UTILS=(
+BREWAPPS=(
     coreutils
     moreutils
+    git
     gnu-sed
     gnu-tar
     gnu-indent
@@ -40,9 +43,6 @@ UTILS=(
     grep
     findutils
     gnupg
-)
-
-BREWAPPS=(
     python
     python2
 )
@@ -55,45 +55,25 @@ CASKAPPS=(
     whatsapp
 )
 
-function revoke_sudo() {
-    echo -n Revoking sudo privileges....
+# undo my special sudoer powers (trap set in setup_sudo)
+# trap handler
+function unsetup_sudo() {
     sudo -- sh -c \
            "rm -f /etc/sudoers.d/wheel; dscl /Local/Default -delete /Groups/wheel GroupMembership $(whoami)"
     echo Log out then back in for changes to take effect
 }
 
-function grant_sudo() {
-    echo Granting sudo privileges....
+# make me a sudoer, temporarily
+function setup_sudo() {
 
-    trap revoke_sudo EXIT
+    trap unsetup_sudo EXIT KILL
 
     printf "%s\n" "%wheel ALL=(ALL) NOPASSWD: ALL" | \
         sudo tee "/etc/sudoers.d/wheel" > /dev/null && \
         sudo dscl /Local/Default append /Groups/wheel GroupMembership "$(whoami)"
 }
 
-function do_ssh() {
-    if [ ! -f ~/.ssh/id_rsa ]; then
-        ssh-keygen
-        eval $(ssh-agent -s)
-        #    ssh-add
-    fi
-}
-
-function do_git() {
-    git remote set-url origin ${GITURL}
-}
-
-function do_repo() {
-    cd ~
-    softwareupdate --install --all
-    xcode-select --install
-    git clone git@github.com:careyjung/dotfiles.git
-    ssh-keygen
-}
-
-function do_brew() {
-    echo "Installing/updating brew..."
+function setup_brew() {
     
     if [ ! `which brew` ]; then
         /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
@@ -102,15 +82,39 @@ function do_brew() {
     brew upgrade
 }
 
-function do_utils() {
-    echo Installing utils...
-    for pkg in ${UTILS[@]}; do
-        brew install $pkg
-    done
+function setup_ssh() {
+
+    if [ ! -f ~/.ssh/id_rsa ]; then
+        ssh-keygen
+        eval $(ssh-agent -s)
+        ssh-add
+    else
+        echo ~/.ssh/id_rsa already exists. Skipping....
+    fi
 }
 
-function do_bash() {
-    echo Installing bash and bash-completion2...
+# still needed?
+function setup_git() {
+
+    # git requires Xcode command-line tools
+    echo -n Please install XCode Developer Tools. I''ll wait...
+    while xcode-select --install 2>/dev/null; do
+        sleep 10
+        echo -n "."
+    done
+    echo "."
+
+    echo git remote set-url origin ${REPO}
+    git remote set-url origin ${REPO}
+}
+
+function setup_repo() {
+
+    git remote set-url origin ${REPO}
+}
+
+function setup_bash() {
+
     brew install bash bash-completion2
     if ! fgrep -q '/usr/local/bin/bash' /etc/shells; then
         echo '/usr/local/bin/bash' | sudo tee -a /etc/shells
@@ -118,27 +122,29 @@ function do_bash() {
     fi
 }
 
-function do_dotfiles() {
-    echo Installing dotfiles: ${DOTFILES[@]}
+function setup_dotfiles() {
+
+    echo ${DOTFILES[@]}
     rsync -avh --no-perms ${DOTFILES[@]} ~
     (cd ~; source ~/.bash_profile)
 }
 
-function do_brewapps() {
-    echo Installing brew apps: ${BREWAPPS[@]}
-    brew install ${BREWAPPS[@]}
+function setup_brewapps() {
+
+    for app in ${BREWAPPS[@]}; do
+        brew install $app
+    done
 }
 
-function do_caskapps() {
-    echo Installing brew cask apps: ${CASKAPPS[@]}
+
+function setup_caskapps() {
+
     for app in ${CASKAPPS[@]}; do
         brew cask install $app
     done
 }
 
-function do_system() {
-    echo Installing system preferences...
-
+function setup_system() {
     # nvram Preferences:
     # - silent boot (unreliable)
     sudo nvram SystemAudioVolume=" "
@@ -159,8 +165,7 @@ function do_system() {
     defaults -currentHost write NSGlobalDomain com.apple.mouse.tapBehavior -int 1
 }
 
-function do_desktop() {
-    echo Setting screen preferences...
+function setup_desktop() {
 
     # Dock Preferences
     # Hot corners:
@@ -175,7 +180,6 @@ function do_desktop() {
     # 11: Launchpad
     # 12: Notification Center
     # 'tr' = top right, 'br' = bottom right, etc.
-    defaults write com.apple.dock autohide -bool true
     defaults write com.apple.dock wvous-tr-corner -int 2
     defaults write com.apple.dock wvous-tr-modifier -int 0
     defaults write com.apple.dock wvous-br-corner -int 10
@@ -183,6 +187,14 @@ function do_desktop() {
     defaults write com.apple.dock wvous-bl-corner -int 4
     defaults write com.apple.dock wvous-bl-modifier -int 0			
     defaults write com.apple.dock minimize-to-application -bool true
+
+    # auto-hide on
+    defaults write com.apple.dock autohide -bool true
+
+    # auto-hide animation off
+    defaults write com.apple.dock autohide-delay -float 0
+    defaults write com.apple.dock autohide-time-modifier -float 0
+
     killall Dock
 
     # Finder Preferences:
@@ -190,13 +202,12 @@ function do_desktop() {
     # - add Quit menu item: ⌘ + Q will also hide desktop icons
     defaults write com.apple.finder CreateDesktop false
     defaults write com.apple.finder QuitMenuItem -bool true
-    killall Finder
+    killall Finder 2>/dev/null
 
     osascript -e 'tell application "Finder" to set desktop picture to POSIX file "/Users/carey/Documents/Still Lake With Goose.jpeg"'
 }
 
-function do_terminal() {
-    echo Installing Terminal preferences...
+function setup_terminal() {
 
     cp init/com.apple.Terminal.plist ~/Library/Preferences
 
@@ -206,20 +217,19 @@ function do_terminal() {
 
 
 
-CALLS=(ssh git brew utils bash dotfiles brewapps caskapps system desktop terminal)
-
 if [ $# -gt 0 ]; then
     unset CALLS
     CALLS=$@
 fi
 
-grant_sudo # revoked on exit
-
 # cd to the dotfiles directory
 cd `dirname $0`
 
 for call in ${CALLS[@]}; do
-    do_${call}
+    echo Setting up ${call}
+    setup_${call}
+    read -p "Done setting up ${call}.
+Press any key to continue... "
 done
 
 exit 0
