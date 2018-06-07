@@ -105,7 +105,7 @@ function do_brew() {
 function do_utils() {
     echo Installing utils...
     for pkg in ${UTILS[@]}; do
-        brew install $pkg --with-default-names
+        brew install $pkg
     done
 }
 

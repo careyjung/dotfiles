@@ -1,5 +1,5 @@
 # Add coreutils gnu-bin to '$PATH'
-gnubin=$(brew --prefix coreutils)/libexec/gnubin && export PATH="$gnubin:$PATH"
+#gnubin=$(brew --prefix coreutils)/libexec/gnubin && export PATH="$gnubin:$PATH"
 
 # Add `~/bin` to the `$PATH`
 export PATH="$HOME/bin:$PATH";
