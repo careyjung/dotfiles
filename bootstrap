@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+GITURL="git@github.com:careyjung/dotfiles.git"
+
 DOTFILES=(
     .aliases
     .bash_logout
@@ -71,12 +73,16 @@ grant_sudo() {
         sudo dscl /Local/Default append /Groups/wheel GroupMembership "$(whoami)"
 }
 
-do_ssh() {
+function do_ssh() {
     if [ ! -f ~/.ssh/id_rsa ]; then
         ssh-keygen
         eval $(ssh-agent -s)
         #    ssh-add
     fi
+}
+
+function do_git() {
+    git remote set-url origin ${GITURL}
 }
 
 function do_repo() {
@@ -200,7 +206,7 @@ function do_terminal() {
 }
 
 
-CALLS=(ssh brew utils bash dotfiles brewapps caskapps system desktop terminal)
+CALLS=(ssh git brew utils bash dotfiles brewapps caskapps system desktop terminal)
 
 if [ $# -gt 0 ]; then
     unset CALLS
