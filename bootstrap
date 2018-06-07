@@ -49,21 +49,20 @@ BREWAPPS=(
 
 CASKAPPS=(
     google-chrome
-    google-backup-and-sync
     marshallofsound-google-play-music-player
     emacs
     sketchup-pro
     whatsapp
 )
 
-revoke_sudo () {
+function revoke_sudo() {
     echo -n Revoking sudo privileges....
     sudo -- sh -c \
            "rm -f /etc/sudoers.d/wheel; dscl /Local/Default -delete /Groups/wheel GroupMembership $(whoami)"
     echo Log out then back in for changes to take effect
 }
 
-grant_sudo() {
+function grant_sudo() {
     echo Granting sudo privileges....
 
     trap revoke_sudo EXIT
@@ -206,6 +205,7 @@ function do_terminal() {
 }
 
 
+
 CALLS=(ssh git brew utils bash dotfiles brewapps caskapps system desktop terminal)
 
 if [ $# -gt 0 ]; then
@@ -214,6 +214,9 @@ if [ $# -gt 0 ]; then
 fi
 
 grant_sudo # revoked on exit
+
+# cd to the dotfiles directory
+cd `dirname $0`
 
 for call in ${CALLS[@]}; do
     do_${call}
