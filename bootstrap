@@ -216,6 +216,17 @@ function setup_terminal() {
 }
 
 
+while getopts ":hi" opt; do
+  case ${opt} in
+    i ) interactive=1
+      ;;
+    h ) lst=$( IFS='|'; echo "Usage: $0 [-i] [${CALLS[*]}]"); echo $lst; exit 0
+      ;;
+    \? ) lst=$( IFS='|'; echo "Usage: $0 [-i] [${CALLS[*]}]"); echo $lst; exit 1
+      ;;
+  esac
+done
+shift $((OPTIND -1))
 
 if [ $# -gt 0 ]; then
     unset CALLS
