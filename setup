@@ -48,6 +48,7 @@ BREWAPPS=(
 )
 
 CASKAPPS=(
+    homebrew/cask-drivers/logitech-options
     google-chrome
     marshallofsound-google-play-music-player
     emacs
@@ -190,8 +191,7 @@ function setup_desktop() {
     # - hide files from Desktop
     # - add Quit menu item: ⌘ + Q will also hide desktop icons
     defaults write com.apple.finder CreateDesktop false
-    defaults write com.apple.finder QuitMenuItem -bool true
-    killall Finder 2>/dev/null
+    killall Finder
 
     osascript -e 'tell application "Finder" to set desktop picture to POSIX file "/Users/carey/Documents/Still Lake With Goose.jpeg"'
 }
