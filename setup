@@ -176,7 +176,11 @@ function setup_desktop() {
     defaults write com.apple.dock wvous-br-modifier -int 0
     defaults write com.apple.dock wvous-bl-corner -int 4
     defaults write com.apple.dock wvous-bl-modifier -int 0			
+
     defaults write com.apple.dock minimize-to-application -bool true
+
+    # Orientation: left, bottom, or right
+    defaults write com.apple.dock orientation -string left
 
     # auto-hide on
     defaults write com.apple.dock autohide -bool true
@@ -189,8 +193,21 @@ function setup_desktop() {
 
     # Finder Preferences:
     # - hide files from Desktop
-    # - add Quit menu item: ⌘ + Q will also hide desktop icons
     defaults write com.apple.finder CreateDesktop false
+
+    # Full POSIX path in Title bar
+    defaults write com.apple.finder _FXShowPosixPathInTitle -bool true
+
+    # Keep folders on top when sorting by name
+    defaults write com.apple.finder _FXSortFoldersFirst -bool true
+
+    # Use list view in all Finder windows by default
+    # Four-letter codes for the other view modes: `icnv`, `clmv`, `Flwv`
+    defaults write com.apple.finder FXPreferredViewStyle -string "Nlsv"
+
+    # Disable the warning before emptying the Trash
+    defaults write com.apple.finder WarnOnEmptyTrash -bool false
+
     killall Finder
 
     osascript -e 'tell application "Finder" to set desktop picture to POSIX file "/Users/carey/Documents/Still Lake With Goose.jpeg"'
