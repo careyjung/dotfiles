@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-CALLS=(sudo dotfiles brew bash ssh repo brewapps caskapps system desktop terminal)
+CALLS=(sudo dotfiles bash repo brewapps caskapps system desktop terminal)
 
 REPO="git@github.com:careyjung/dotfiles.git"
 
@@ -82,17 +82,6 @@ function setup_brew() {
     brew upgrade
 }
 
-function setup_ssh() {
-
-    if [ ! -f ~/.ssh/id_rsa ]; then
-        ssh-keygen
-        eval $(ssh-agent -s)
-        ssh-add
-    else
-        echo ~/.ssh/id_rsa already exists. Skipping....
-    fi
-}
-
 # still needed?
 function setup_git() {
 
@@ -118,7 +107,7 @@ function setup_bash() {
     brew install bash bash-completion2
     if ! fgrep -q '/usr/local/bin/bash' /etc/shells; then
         echo '/usr/local/bin/bash' | sudo tee -a /etc/shells
-        chsh -s /usr/local/bin/bash;
+        sudo chsh -s /usr/local/bin/bash;
     fi
 }
 
@@ -244,6 +233,7 @@ for call in ${CALLS[@]}; do
 Press any key to continue... "
     else
         echo Done setting up ${call}.
+    fi
 done
 
 exit 0
