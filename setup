@@ -108,8 +108,11 @@ function setup_bash() {
     brew install bash bash-completion2
     if ! fgrep -q '/usr/local/bin/bash' /etc/shells; then
         echo '/usr/local/bin/bash' | sudo tee -a /etc/shells
-        sudo chsh -s /usr/local/bin/bash;
     fi
+    if [ $SHELL != '/usr/local/bin/bash' ]; then
+        sudo chsh -s /usr/local/bin/bash $(whoami)
+    fi
+        
 }
 
 function setup_dotfiles() {
