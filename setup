@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-CALLS=(sudo bash dotfiles repo brewapps caskapps system desktop terminal)
+CALLS=(sudo bash dotfiles repo brewapps caskapps system appstore dock finder terminal)
 
 REPO="git@github.com:careyjung/dotfiles.git"
 
@@ -159,7 +159,45 @@ function setup_system() {
     defaults -currentHost write NSGlobalDomain com.apple.mouse.tapBehavior -int 1
 }
 
-function setup_desktop() {
+function setup_appstore() {
+
+    # NB: the softwareupdate command below is the only one that seems
+    # to have any effect on system settings
+
+    # These supposedly need to run as root
+    sudo softwareupdate --schedule off
+
+    # Enable the WebKit Developer Tools in the Mac App Store
+    sudo defaults write com.apple.appstore WebKitDeveloperExtras -bool true
+
+    # Enable Debug Menu in the Mac App Store
+    sudo defaults write com.apple.appstore ShowDebugMenu -bool true
+
+    # Enable the automatic update check
+    sudo defaults write com.apple.SoftwareUpdate AutomaticCheckEnabled -bool true
+    # Check for software updates daily, not just once per week
+    sudo defaults write com.apple.SoftwareUpdate ScheduleFrequency -int 1
+
+    # Download newly available updates in background
+    sudo defaults write com.apple.SoftwareUpdate AutomaticDownload -int 1
+
+    # Install System data files & security updates
+    sudo defaults write com.apple.SoftwareUpdate CriticalUpdateInstall -int 1
+
+    # Automatically download apps purchased on other Macs
+    sudo defaults write com.apple.SoftwareUpdate ConfigDataInstall -int 1
+
+    # Turn on app auto-update
+    sudo defaults write com.apple.commerce AutoUpdate -bool true
+
+    # Allow the App Store to reboot machine on macOS updates
+    sudo defaults write com.apple.commerce AutoUpdateRestartRequired -bool true
+    sudo softwareupdate --schedule on
+
+}
+
+
+function setup_dock() {
 
     # Dock Preferences
     # Hot corners:
@@ -194,6 +232,9 @@ function setup_desktop() {
     defaults write com.apple.dock autohide-time-modifier -float 0
 
     killall Dock
+}
+
+function setup_finder() {
 
     # Finder Preferences:
     # - hide files from Desktop
@@ -203,18 +244,16 @@ function setup_desktop() {
     defaults write com.apple.finder _FXShowPosixPathInTitle -bool true
 
     # Keep folders on top when sorting by name
-    defaults write com.apple.finder _FXSortFoldersFirst -bool true
+    # defaults write com.apple.finder _FXSortFoldersFirst -bool true
 
     # Use list view in all Finder windows by default
     # Four-letter codes for the other view modes: `icnv`, `clmv`, `Flwv`
-    defaults write com.apple.finder FXPreferredViewStyle -string "Nlsv"
+    defaults write com.apple.finder FXPreferredViewStyle -string "clmv"
 
     # Disable the warning before emptying the Trash
     defaults write com.apple.finder WarnOnEmptyTrash -bool false
 
     killall Finder
-
-    osascript -e 'tell application "Finder" to set desktop picture to POSIX file "/Users/carey/Documents/Still Lake With Goose.jpeg"'
 }
 
 function setup_terminal() {
