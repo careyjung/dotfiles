@@ -149,3 +149,6 @@ alias reload="exec ${SHELL} -l"
 
 # Print each PATH entry on a separate line
 alias path='echo -e ${PATH//:/\\n}'
+
+# keep emacs in the terminal window when invoked from the command line
+alias emacs='TERM=xterm emacs -nw'
