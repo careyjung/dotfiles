@@ -54,6 +54,7 @@ CASKAPPS=(
     emacs
     sketchup-pro
     whatsapp
+    flux
 )
 
 # undo my special sudoer powers (trap set in setup_sudo)
