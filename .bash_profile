@@ -28,3 +28,8 @@ shopt -s cdspell;
 for option in autocd globstar; do
 	shopt -s "$option" 2> /dev/null;
 done;
+
+# python virtualenv setup
+export WORKON_HOME=$HOME/Documents/.virtualenvs
+export PROJECT_HOME=$HOME/Documents/projects
+source /usr/local/bin/virtualenvwrapper.sh
