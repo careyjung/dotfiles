@@ -2,7 +2,7 @@
 
 # Make vim the default editor.
 #export EDITOR='vim';
-export EDITOR='TERM=xterm emacs -nw'
+export EDITOR='TERM=xterm emacs -nw --no-desktop'
 
 # Enable persistent REPL history for `node`.
 export NODE_REPL_HISTORY=~/.node_history;
