@@ -31,6 +31,7 @@ done;
 
 # python virtualenv setup
 unset VIRTUALENVWRAPPER_HOOK_DIR
-export WORKON_HOME=$HOME/Documents/.virtualenvs
+export WORKON_HOME=$HOME/Documents/virtualenvs
 export PROJECT_HOME=$HOME/Documents/projects
+export VIRTUALENVWRAPPER_WORKON_CD=1
 source /usr/local/bin/virtualenvwrapper.sh
