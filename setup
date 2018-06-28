@@ -50,6 +50,7 @@ BREWAPPS=(
 CASKAPPS=(
     homebrew/cask-drivers/logitech-options
     google-chrome
+    homebrew/cask-versions/google-chrome-canary
     marshallofsound-google-play-music-player
     emacs
     sketchup-pro
