@@ -1,14 +1,36 @@
-# Compiled Python files
-*.pyc
-
-# Folder view configuration files
+# MacOS files
+.CFUserTextEncoding
 .DS_Store
-Desktop.ini
+.Trash/
 
-# Thumbnail cache files
-._*
-Thumbs.db
+# bash history and session info
+.bash_history
+.bash_sessions/
 
-# Files that might appear on external disks
-.Spotlight-V100
-.Trashes
+# printer stuff
+.cups/
+
+
+# Emacs config dir, except for init.el
+.emacs.d/
+!.emacs.d/init.el
+
+.gnupg/
+.lesshst
+.python_history
+
+.ssh/
+!.ssh/config
+
+.viminfo
+Applications/
+Desktop/
+Documents/
+Downloads/
+Library/
+Movies/
+Music/
+Pictures/
+Public/
+dotfiles/
+tmp/
