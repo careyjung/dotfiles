@@ -1,9 +1,10 @@
 #!/usr/bin/env bash
 
-CALLS=(sudo bash dotfiles repo brewapps caskapps system appstore dock finder terminal)
+CALLS=(sudo bash repo brewapps caskapps system appstore dock finder terminal)
 
 REPO="git@github.com:careyjung/dotfiles.git"
 
+# no longer used
 DOTFILES=(
     .aliases
     .bash_logout
@@ -118,6 +119,7 @@ function setup_bash() {
         
 }
 
+# no longer called, since we checkout directly into home
 function setup_dotfiles() {
 
     echo ${DOTFILES[@]}
