@@ -284,8 +284,8 @@ if [ $# -gt 0 ]; then
     CALLS=$@
 fi
 
-# cd to the dotfiles directory
-cd `dirname $0`
+# go home
+cd ~
 
 for call in ${CALLS[@]}; do
     echo Setting up ${call}

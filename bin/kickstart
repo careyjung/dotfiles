@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+
+if [ ! `which brew` ]; then
+    /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+fi
+brew update
+brew upgrade
+brew install git
+
+git init
+git remote add origin git@github.com:careyjung/dotfiles.git
+git fetch
+git checkout origin/master -ft
+
+#~/bin/setup
+
+exit 0
