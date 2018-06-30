@@ -2,12 +2,8 @@
 
 cd ~
 
-if [ ! `which brew` ]; then
-    /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
-fi
-brew update
-brew upgrade
-brew install git
+tar xvf Documents/Keys/ssh.tar
+tar xvf Documents/Keys/gnupg.tar
 
 if [ ! -d .git ]; then
     git init

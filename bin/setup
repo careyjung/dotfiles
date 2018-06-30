@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-CALLS=(sudo bash repo brewapps caskapps system appstore dock finder terminal)
+CALLS=(sudo brew bash repo brewapps caskapps system appstore dock finder terminal)
 
 REPO="git@github.com:careyjung/dotfiles.git"
 
