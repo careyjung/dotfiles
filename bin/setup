@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 CALLS=(
+    homebrew
     repo
     sudo
     system
@@ -8,16 +9,9 @@ CALLS=(
     finder
     dock
     appstore
-    homebrew
     bash
-    brewapps
-    caskapps
-)
-
-BREWAPPS=(
-    git
     python
-    python2
+    caskapps
 )
 
 CASKAPPS=(
@@ -39,11 +33,10 @@ function unsetup_sudo() {
 
 
 function setup_repo() {
-    # go home
-    cd ~
-
     [ -d .ssh ] || tar xvf Documents/Keys/ssh.tar
     [ -d .gnupg ] || tar xvf Documents/Keys/gnupg.tar
+
+    brew install git
 
     if [ ! -d .git ]; then
         git init
@@ -94,11 +87,11 @@ function setup_dotfiles() {
     (cd ~; source ~/.bash_profile)
 }
 
-function setup_brewapps() {
+function setup_python() {
 
-    for app in ${BREWAPPS[@]}; do
-        brew install $app
-    done
+    brew install python python2
+    pip install virtualenvwrapper
+    . ~/.bash_profile
 }
 
 
@@ -252,6 +245,9 @@ if [ $# -gt 0 ]; then
     unset CALLS
     CALLS=$@
 fi
+
+# go home
+cd ~
 
 for call in ${CALLS[@]}; do
     echo Setting up ${call}
