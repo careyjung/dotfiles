@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 CALLS=(
+    repo
     sudo
     system
     terminal
@@ -35,6 +36,23 @@ function unsetup_sudo() {
            "rm -f /etc/sudoers.d/wheel; dscl /Local/Default -delete /Groups/wheel GroupMembership $(whoami)"
     echo Log out then back in for changes to take effect
 }
+
+
+function setup_repo() {
+    # go home
+    cd ~
+
+    [ -d .ssh ] || tar xvf Documents/Keys/ssh.tar
+    [ -d .gnupg ] || tar xvf Documents/Keys/gnupg.tar
+
+    if [ ! -d .git ]; then
+        git init
+        git remote add origin git@github.com:careyjung/dotfiles.git
+        git fetch
+        git checkout origin/master --force --track
+    fi
+}
+
 
 # make me a sudoer, temporarily
 function setup_sudo() {
@@ -234,9 +252,6 @@ if [ $# -gt 0 ]; then
     unset CALLS
     CALLS=$@
 fi
-
-# go home
-cd ~
 
 for call in ${CALLS[@]}; do
     echo Setting up ${call}
