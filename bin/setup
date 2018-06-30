@@ -1,17 +1,17 @@
 #!/usr/bin/env bash
 
 CALLS=(
-    homebrew
-    repo
     sudo
+    homebrew
+    bash
+    python
+    caskapps
     system
     terminal
     finder
     dock
     appstore
-    bash
-    python
-    caskapps
+    repo
 )
 
 CASKAPPS=(
