@@ -26,6 +26,7 @@
 Applications/
 Desktop/
 Documents/
+!Documents/bin/kickstart
 Downloads/
 Library/
 Movies/
