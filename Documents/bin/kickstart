@@ -2,8 +2,8 @@
 
 cd ~
 
-tar xvf Documents/Keys/ssh.tar
-tar xvf Documents/Keys/gnupg.tar
+[ -d .ssh ] || tar xvf Documents/Keys/ssh.tar
+[ -d .gnupg ] || tar xvf Documents/Keys/gnupg.tar
 
 if [ ! -d .git ]; then
     git init

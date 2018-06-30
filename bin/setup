@@ -1,62 +1,31 @@
 #!/usr/bin/env bash
 
-CALLS=(sudo brew bash repo brewapps caskapps system appstore dock finder terminal)
-
-REPO="git@github.com:careyjung/dotfiles.git"
-
-# no longer used
-DOTFILES=(
-    .aliases
-    .bash_logout
-    .bash_profile
-    .bash_prompt
-    .bashrc
-    .curlrc
-    .editorconfig
-    .emacs.d
-    .exports
-    .functions
-    .gdbinit
-    .gitattributes
-    .gitconfig
-    .gitignore
-    .gvimrc
-    .hgignore
-    .hushlogin
-    .inputrc
-    .profile
-    .screenrc
-    .ssh
-    .tmux.conf
-    .vim
-    .vimrc
-    .wgetrc
+CALLS=(
+    sudo
+    system
+    terminal
+    finder
+    dock
+    appstore
+    homebrew
+    bash
+    brewapps
+    caskapps
 )
 
 BREWAPPS=(
-    coreutils
-    moreutils
     git
-    gnu-sed
-    gnu-tar
-    gnu-indent
-    gnu-which
-    grep
-    findutils
-    gnupg
     python
     python2
 )
 
 CASKAPPS=(
-    homebrew/cask-drivers/logitech-options
+    logitech-options
     google-chrome
-    homebrew/cask-versions/google-chrome-canary
     marshallofsound-google-play-music-player
     emacs
     sketchup-pro
     whatsapp
-    flux
 )
 
 # undo my special sudoer powers (trap set in setup_sudo)
@@ -77,33 +46,13 @@ function setup_sudo() {
         sudo dscl /Local/Default append /Groups/wheel GroupMembership "$(whoami)"
 }
 
-function setup_brew() {
+function setup_homebrew() {
     
     if [ ! `which brew` ]; then
         /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
     fi
     brew update
     brew upgrade
-}
-
-# still needed?
-function setup_git() {
-
-    # git requires Xcode command-line tools
-    echo -n Please install XCode Developer Tools. I''ll wait...
-    while xcode-select --install 2>/dev/null; do
-        sleep 10
-        echo -n "."
-    done
-    echo "."
-
-    echo git remote set-url origin ${REPO}
-    git remote set-url origin ${REPO}
-}
-
-function setup_repo() {
-
-    git remote set-url origin ${REPO}
 }
 
 function setup_bash() {
