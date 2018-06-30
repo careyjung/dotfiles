@@ -44,6 +44,8 @@ function setup_repo() {
         git fetch
         git checkout origin/master --force --track
     fi
+
+    . ~/.bash_profile
 }
 
 
@@ -91,7 +93,6 @@ function setup_python() {
 
     brew install python python2
     pip install virtualenvwrapper
-    . ~/.bash_profile
 }
 
 
