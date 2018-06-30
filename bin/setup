@@ -32,10 +32,22 @@ function unsetup_sudo() {
 }
 
 
+# make me a sudoer, temporarily
+function setup_sudo() {
+
+    trap unsetup_sudo EXIT KILL
+
+    printf "%s\n" "%wheel ALL=(ALL) NOPASSWD: ALL" | \
+        sudo tee "/etc/sudoers.d/wheel" > /dev/null && \
+        sudo dscl /Local/Default append /Groups/wheel GroupMembership "$(whoami)"
+}
+
 function setup_repo() {
     [ -d .ssh ] || tar xvf Documents/Keys/ssh.tar
     [ -d .gnupg ] || tar xvf Documents/Keys/gnupg.tar
 
+    # git the latest git. This also conveniently installs
+    # macos Command Line Utilities as a dependency
     brew install git
 
     if [ ! -d .git ]; then
@@ -46,17 +58,6 @@ function setup_repo() {
     fi
 
     . ~/.bash_profile
-}
-
-
-# make me a sudoer, temporarily
-function setup_sudo() {
-
-    trap unsetup_sudo EXIT KILL
-
-    printf "%s\n" "%wheel ALL=(ALL) NOPASSWD: ALL" | \
-        sudo tee "/etc/sudoers.d/wheel" > /dev/null && \
-        sudo dscl /Local/Default append /Groups/wheel GroupMembership "$(whoami)"
 }
 
 function setup_homebrew() {
@@ -79,14 +80,6 @@ function setup_bash() {
         sudo chsh -s /usr/local/bin/bash $(whoami)
     fi
         
-}
-
-# no longer called, since we checkout directly into home
-function setup_dotfiles() {
-
-    echo ${DOTFILES[@]}
-    rsync -avh --no-perms ${DOTFILES[@]} ~
-    (cd ~; source ~/.bash_profile)
 }
 
 function setup_python() {
@@ -229,8 +222,11 @@ function setup_terminal() {
     defaults read com.apple.Terminal>/dev/null 
 }
 
+###########################################################################
+# main
+###########################################################################
 
-while getopts ":hi" opt; do
+while getopts ":hid" opt; do
   case ${opt} in
     i ) interactive=1
       ;;
@@ -242,13 +238,15 @@ while getopts ":hi" opt; do
 done
 shift $((OPTIND -1))
 
+# if specified on the command line, only do those setups
 if [ $# -gt 0 ]; then
     unset CALLS
     CALLS=$@
 fi
 
-# go home
+# run everything from homedir. (will probably work regardless, but I'm not sure)
 cd ~
+
 
 for call in ${CALLS[@]}; do
     echo Setting up ${call}
