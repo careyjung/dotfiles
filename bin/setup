@@ -3,7 +3,8 @@
 CALLS=(
     sudo
     homebrew
-    bash
+    brewapps
+    caskapps
     python
     caskapps
     system
@@ -11,10 +12,19 @@ CALLS=(
     finder
     dock
     appstore
+    bash
     repo
 )
 
+BREWAPPS=(
+    bash
+    git
+    python
+    python2
+)
+
 CASKAPPS=(
+    homebrew/cask/gpg-suite
     homebrew/cask-drivers/logitech-options
     google-chrome
     marshallofsound-google-play-music-player
@@ -43,12 +53,9 @@ function setup_sudo() {
 }
 
 function setup_repo() {
+
     [ -d .ssh ] || tar xvf Documents/Keys/ssh.tar
     [ -d .gnupg ] || tar xvf Documents/Keys/gnupg.tar
-
-    # git the latest git. This also conveniently installs
-    # macos Command Line Utilities as a dependency
-    brew install git
 
     if [ ! -d .git ]; then
         git init
@@ -71,8 +78,6 @@ function setup_homebrew() {
 
 function setup_bash() {
 
-    brew install bash
-
     if ! fgrep -q '/usr/local/bin/bash' /etc/shells; then
         echo '/usr/local/bin/bash' | sudo tee -a /etc/shells
     fi
@@ -83,11 +88,16 @@ function setup_bash() {
 }
 
 function setup_python() {
-
-    brew install python python2
     pip install virtualenvwrapper
 }
 
+
+function setup_brewapps() {
+
+    for app in ${BREWAPPS[@]}; do
+        brew install $app
+    done
+}
 
 function setup_caskapps() {
 
