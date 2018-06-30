@@ -15,7 +15,7 @@ CALLS=(
 )
 
 CASKAPPS=(
-    logitech-options
+    homebrew/cask-drivers/logitech-options
     google-chrome
     marshallofsound-google-play-music-player
     emacs
