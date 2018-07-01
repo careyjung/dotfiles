@@ -1,0 +1,8 @@
+#
+# System-wide .gitignore file
+#
+
+# MacOS files
+.CFUserTextEncoding
+.DS_Store
+.Trash/
