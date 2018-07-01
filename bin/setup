@@ -18,6 +18,7 @@ CALLS=(
 
 BREWAPPS=(
     bash
+    coreutils
     git
     python
     python2

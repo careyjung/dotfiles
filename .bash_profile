@@ -1,9 +1,7 @@
-# Add coreutils gnu-bin to '$PATH'
-#gnubin=$(brew --prefix coreutils)/libexec/gnubin && export PATH="$gnubin:$PATH"
+# Add '~/bin' and coreutils gnu-bin to '$PATH'
+export PATH="$HOME/bin:/usr/local/opt/coreutils/libexec/gnubin:$PATH"
 
-# Add `~/bin` to the `$PATH`
-export PATH="$HOME/bin:$PATH";
-   
+export MANPATH="/usr/local/opt/coreutils/libexec/gnuman:$MANPATH
 
 # Load the shell dotfiles, and then some:
 # * ~/.path can be used to extend `$PATH`.
