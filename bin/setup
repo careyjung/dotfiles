@@ -21,6 +21,7 @@ BREWAPPS=(
     git
     python
     python2
+    dockutil
 )
 
 CASKAPPS=(
@@ -166,6 +167,7 @@ function setup_appstore() {
 
 
 function setup_dock() {
+    [ $(which dockutil) ] || brew install dockutil
 
     # Dock Preferences
     # Hot corners:
@@ -199,7 +201,11 @@ function setup_dock() {
     defaults write com.apple.dock autohide-delay -float 0
     defaults write com.apple.dock autohide-time-modifier -float 0
 
-    killall Dock
+    # remove all apps from the dock. I'll add the onese I need
+    # as I go. And in Mojave, the new 'recently used' section
+    # in the dock does about everything I need.
+    # Note to self: dockutil does a 'killall Dock' to restart it
+    dockutil --remove all
 }
 
 function setup_finder() {
