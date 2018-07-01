@@ -152,3 +152,7 @@ alias path='echo -e ${PATH//:/\\n}'
 
 # keep emacs in the terminal window when invoked from the command line
 alias emacs='TERM=xterm emacs -nw --no-desktop'
+
+# dump preference list files to xml
+alias pl2xml='plutil -convert xml1 -o -'
+
