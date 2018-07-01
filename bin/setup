@@ -56,8 +56,8 @@ function setup_sudo() {
 
 function setup_repo() {
 
-    [ -d .ssh ] || tar xvf Documents/Keys/ssh.tar
-    [ -d .gnupg ] || tar xvf Documents/Keys/gnupg.tar
+    tar xvf Documents/Keys/ssh.tar
+    tar xvf Documents/Keys/gnupg.tar
 
     if [ ! -d .git ]; then
         git init
