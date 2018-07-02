@@ -51,6 +51,21 @@
 
 ;; load solarized dark theme
 ;; See https://github.com/bbatsov/solarized-emacs/blob/master/README.md
+;; make the fringe stand out from the background
+(setq solarized-distinct-fringe-background t)
+
+;; Don't change the font for some headings and titles
+;(setq solarized-use-variable-pitch nil)
+
+;; make the modeline high contrast
+(setq solarized-high-contrast-mode-line t)
+
+;; Use less bolding
+;(setq solarized-use-less-bold t)
+
+;; Use more italics
+;(setq solarized-use-more-italic t)
+
 (load-theme 'solarized-dark t)
 
 ;; Pick up needed shell variables when starting from the Dock/Finder
