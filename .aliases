@@ -1,18 +1,15 @@
 #!/usr/bin/env bash
 
-# Easier navigation: .., ..., ...., ....., ~ and -
+# Navigation shortcuts
+alias h="cd ~"
+alias d="cd ~/Documents"
+alias p="cd ~/Documents/projects"
+alias dl="cd ~/Downloads"
 alias ..="cd .."
 alias ...="cd ../.."
 alias ....="cd ../../.."
-alias .....="cd ../../../.."
-alias ~="cd ~" # `cd` is probably faster to type though
 alias -- -="cd -"
 
-# Shortcuts
-alias d="cd ~/Documents/Dropbox"
-alias dl="cd ~/Downloads"
-alias dt="cd ~/Desktop"
-alias p="cd ~/Documents/projects"
 alias g="git"
 
 # Detect which `ls` flavor is in use
@@ -155,4 +152,5 @@ alias emacs='TERM=xterm emacs -nw --no-desktop'
 
 # dump preference list files to xml
 alias pl2xml='plutil -convert xml1 -o -'
+
 
