@@ -23,6 +23,7 @@ BREWAPPS=(
     python
     python2
     dockutil
+    hyper
 )
 
 CASKAPPS=(
