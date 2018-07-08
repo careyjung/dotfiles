@@ -23,10 +23,10 @@ BREWAPPS=(
     python
     python2
     dockutil
-    hyper
 )
 
 CASKAPPS=(
+    homebrew/cask/hyper
     homebrew/cask/gpg-suite
     homebrew/cask-drivers/logitech-options
     google-chrome
