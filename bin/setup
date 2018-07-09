@@ -129,6 +129,8 @@ function setup_system() {
     defaults write NSGlobalDomain com.apple.trackpad.scaling -int 3		# fast tracking
     defaults write com.apple.driver.AppleBluetoothMultitouch.trackpad Clicking -bool true # tap to click
     defaults -currentHost write NSGlobalDomain com.apple.mouse.tapBehavior -int 1
+
+    killall cfprefsd
 }
 
 function setup_appstore() {
@@ -204,6 +206,8 @@ function setup_dock() {
     defaults write com.apple.dock autohide-delay -float 0
     defaults write com.apple.dock autohide-time-modifier -float 0
 
+    killall cfprefsd
+
     # remove all apps from the dock. I'll add the onese I need
     # as I go. And in Mojave, the new 'recently used' section
     # in the dock does about everything I need.
@@ -230,15 +234,32 @@ function setup_finder() {
     # Disable the warning before emptying the Trash
     defaults write com.apple.finder WarnOnEmptyTrash -bool false
 
+    killall cfprefsd
     killall Finder
 }
 
 function setup_terminal() {
 
-    cp init/com.apple.Terminal.plist ~/Library/Preferences
+    # delete existing Solarized Dark profile, if it exists
+    /usr/libexec/PlistBuddy ~/Library/Preferences/com.apple.Terminal.plist -x -c \
+                            "delete ':Window Settings:Solarized Dark'" 2>/dev/null
 
-    # Force Terminal to flush its cache (supposedly)
-    defaults read com.apple.Terminal>/dev/null 
+    # add back the key
+    /usr/libexec/PlistBuddy ~/Library/Preferences/com.apple.Terminal.plist -x -c \
+                            "add ':Window Settings:Solarized Dark' dict"
+
+    # import previously saved Terminal preferences
+    /usr/libexec/PlistBuddy ~/Library/Preferences/com.apple.Terminal.plist -x -c \
+                            "merge '/Users/careyjung/init/Solarized Dark.terminal' ':Window Settings:Solarized Dark'"
+
+    # make them the default
+    /usr/libexec/PlistBuddy ~/Library/Preferences/com.apple.Terminal.plist -x -c \
+                            "set ':Default Window Settings' 'Solarized Dark'"
+    /usr/libexec/PlistBuddy ~/Library/Preferences/com.apple.Terminal.plist -x -c \
+                            "set ':Startup Window Settings' 'Solarized Dark'"
+
+    # flush the plist cache
+    killall cfprefsd
 }
 
 ###########################################################################
