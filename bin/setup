@@ -1,10 +1,8 @@
 #!/usr/bin/env bash
 
 CALLS=(
-    sudo
     homebrew
     brewapps
-    caskapps
     python
     caskapps
     system
@@ -20,13 +18,10 @@ BREWAPPS=(
     bash
     coreutils
     git
-    python
-    python2
     dockutil
 )
 
 CASKAPPS=(
-    homebrew/cask/hyper
     homebrew/cask/gpg-suite
     homebrew/cask-drivers/logitech-options
     google-chrome
@@ -36,23 +31,12 @@ CASKAPPS=(
     whatsapp
 )
 
-# undo my special sudoer powers (trap set in setup_sudo)
-# trap handler
-function unsetup_sudo() {
-    sudo -- sh -c \
-           "rm -f /etc/sudoers.d/wheel; dscl /Local/Default -delete /Groups/wheel GroupMembership $(whoami)"
-    echo Log out then back in for changes to take effect
-}
+function setup_virtualbox() {
+    brew cask install virtualbox
+    read -p "Go to Security & Privacy settings and approve the Oracle extensions. Press any key to continue... "
+    brew cask install virtualbox
 
-
-# make me a sudoer, temporarily
-function setup_sudo() {
-
-    trap unsetup_sudo EXIT KILL
-
-    printf "%s\n" "%wheel ALL=(ALL) NOPASSWD: ALL" | \
-        sudo tee "/etc/sudoers.d/wheel" > /dev/null && \
-        sudo dscl /Local/Default append /Groups/wheel GroupMembership "$(whoami)"
+    brew cask install virtualbox-extension-pack
 }
 
 function setup_repo() {
@@ -92,6 +76,8 @@ function setup_bash() {
 }
 
 function setup_python() {
+    brew install python
+    brew install python2
     pip install virtualenvwrapper
 }
 
@@ -206,9 +192,7 @@ function setup_dock() {
     defaults write com.apple.dock autohide-delay -float 0
     defaults write com.apple.dock autohide-time-modifier -float 0
 
-    killall cfprefsd
-
-    # remove all apps from the dock. I'll add the onese I need
+    # remove all apps from the dock. I'll add those I need
     # as I go. And in Mojave, the new 'recently used' section
     # in the dock does about everything I need.
     # Note to self: dockutil does a 'killall Dock' to restart it
@@ -289,6 +273,10 @@ cd ~
 
 
 for call in ${CALLS[@]}; do
+
+    # Enable sudo ahead of time
+    sudo -v
+    
     echo Setting up ${call}
     setup_${call}
     if [ $interactive ]; then
