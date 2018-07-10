@@ -108,6 +108,11 @@
 ;; javascript indent 
 (setq js-indent-level 2)
 
+;; shorthands
+(defalias 'config 'elpy-config)
+(defalias 'workon 'pyvenv-workon)
+(defalias 'deactivate 'pyvenv-deactivate)
+
 ;; init.el ends here
 
 (custom-set-variables
