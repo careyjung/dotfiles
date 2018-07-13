@@ -30,7 +30,7 @@ while true do
     hash = new_hash
 
     diff_hash.each do |df|
-      # puts "Detected change in #{df[0]}, refreshing"
+      puts "Detected change in #{df[0]}, refreshing tabs matching: #{keyword}"
       %x{osascript<<ENDGAME
         tell application "Google Chrome"
       	  set windowList to every window
