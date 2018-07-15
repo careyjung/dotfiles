@@ -1,35 +1,11 @@
 ;; init.el --- Emacs configuration
 
-;; BASIC CUSTOMIZATION
-;; --------------------------------------
-
-;; Turn on desktop save mode:
-(desktop-save-mode 1)
-(setq desktop-path '("~/.emacs.d"))
-(setq desktop-save 't)
-
-;; hide the startup message
-(setq inhibit-startup-message t)
-
-;; enable line numbers globally
-(global-linum-mode t)
-
-;; disable tool bar
-(tool-bar-mode -1)
-
-;; don't leave any "~" turds lying around
-(setq make-backup-files nil)
-
-
-
 ;; INSTALL PACKAGES
 ;; --------------------------------------
 
 (require 'package)
-
 (add-to-list 'package-archives
        '("melpa-stable" . "http://stable.melpa.org/packages/"))
-
 (package-initialize)
 
 (when (not package-archive-contents)
@@ -43,6 +19,7 @@
     solarized-theme
     exec-path-from-shell
     web-mode
+    markdown-mode
     ))
 
 (mapc #'(lambda (package)
@@ -106,7 +83,23 @@
 )
 (add-hook 'web-mode-hook  'my-web-mode-hook)
 
+;;
+;; markdown-mode setup
+;;
+(autoload 'markdown-mode "markdown-mode"
+   "Major mode for editing Markdown files" t)
+(add-to-list 'auto-mode-alist '("\\.markdown\\'" . markdown-mode))
+(add-to-list 'auto-mode-alist '("\\.md\\'" . markdown-mode))
 
+(autoload 'gfm-mode "markdown-mode"
+   "Major mode for editing GitHub Flavored Markdown files" t)
+(add-to-list 'auto-mode-alist '("README\\.md\\'" . gfm-mode))
+
+;; Use visual-line-mode in gfm-mode
+(defun my-gfm-mode-hook ()
+  (visual-line-mode 1)
+  (auto-fill-mode 1))
+(add-hook 'gfm-mode-hook 'my-gfm-mode-hook)
 
 ;;
 ;; Enable emacs lisp python stuff
@@ -141,6 +134,29 @@
 (defalias 'config 'elpy-config)
 (defalias 'workon 'pyvenv-workon)
 (defalias 'deactivate 'pyvenv-deactivate)
+
+;; BASIC CUSTOMIZATION
+;; --------------------------------------
+
+;; Turn on desktop save mode:
+(desktop-save-mode 1)
+(setq desktop-path '("~/.emacs.d"))
+(setq desktop-save 't)
+
+;; hide the startup message
+(setq inhibit-startup-message t)
+
+;; enable line numbers globally
+(global-linum-mode t)
+
+;; disable tool bar
+(tool-bar-mode -1)
+
+;; don't leave any "~" turds lying around
+(setq make-backup-files nil)
+
+;;
+(global-set-key (kbd "C-c C-v") 'browse-url-of-file)
 
 ;; init.el ends here
 
