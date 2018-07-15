@@ -19,6 +19,7 @@ BREWAPPS=(
     coreutils
     git
     dockutil
+    nmap
 )
 
 CASKAPPS=(
