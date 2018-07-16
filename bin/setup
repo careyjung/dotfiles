@@ -20,6 +20,7 @@ BREWAPPS=(
     git
     dockutil
     nmap
+    sass/sass/sass
 )
 
 CASKAPPS=(
