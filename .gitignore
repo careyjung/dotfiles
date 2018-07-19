@@ -1,28 +1,32 @@
-# bash history and session info
-.bash_history
-.bash_sessions/
-
-# printer stuff
-.cups/
+#
+# 'dotfiles' gitignore file (not to be confused with system ignore file)
+#
 
 
-# Emacs config dir, except for init.el
+# ignore Emacs config dir, except for init.el
 .emacs.d/
 !.emacs.d/init.el
 
-.gnupg/
-.lesshst
-.python_history
-
+# ignore .ssh except for config
 .ssh/
 !.ssh/config
 
+# ignore ~/Library, except for iterm2 prefs file 
+Library/
+!Library/Preferences/com.googlecode.iterm2.plist
+
+# everything else
+.bash_history
+.bash_sessions/
+.cups/
+.gnupg/
+.lesshst
+.python_history
 .viminfo
 Applications/
 Desktop/
 Documents/
 Downloads/
-Library/
 Movies/
 Music/
 Pictures/
