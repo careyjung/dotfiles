@@ -3,6 +3,7 @@
 CALLS=(
     homebrew
     brewapps
+    iterm2
     python
     caskapps
     system
@@ -21,6 +22,7 @@ BREWAPPS=(
     dockutil
     nmap
     sass/sass/sass
+    tmux
 )
 
 CASKAPPS=(
@@ -31,7 +33,13 @@ CASKAPPS=(
     emacs
     sketchup-pro
     whatsapp
+    slack
 )
+
+function setup_iterm2() {
+    brew cask install iterm2
+    cp init/com.googlecode.iterm2.plist ~/Library/Preferences
+}
 
 function setup_virtualbox() {
     brew cask install virtualbox
@@ -117,6 +125,15 @@ function setup_system() {
     defaults write NSGlobalDomain com.apple.trackpad.scaling -int 3		# fast tracking
     defaults write com.apple.driver.AppleBluetoothMultitouch.trackpad Clicking -bool true # tap to click
     defaults -currentHost write NSGlobalDomain com.apple.mouse.tapBehavior -int 1
+
+    # Clock Display (add date and seconds)
+    defaults write com.apple.menuextra.clock DateFormat -string "EEE MMM d  h:mm:ss a"
+
+    # General Preferences: preserve windows when closing an app
+    defaults write NSGlobalDomain NSQuitAlwaysKeepsWindows '<true/>'
+
+    # General tab: use dark menu bar and dock
+    defaults write .GlobalPreferences AppleInterfaceStyle -string Dark
 
     killall cfprefsd
 }
