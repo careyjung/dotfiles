@@ -20,6 +20,7 @@ Library/
 .bash_sessions/
 .cups/
 .gnupg/
+.gnupg_pre_2.1/
 .lesshst
 .python_history
 .viminfo
