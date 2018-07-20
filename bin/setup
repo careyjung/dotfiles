@@ -2,7 +2,9 @@
 
 CALLS=(
     homebrew
+    bash
     brewapps
+    repo
     iterm2
     python
     caskapps
@@ -11,12 +13,9 @@ CALLS=(
     finder
     dock
     appstore
-    bash
-    repo
 )
 
 BREWAPPS=(
-    bash
     coreutils
     git
     dockutil
@@ -36,17 +35,36 @@ CASKAPPS=(
     slack
 )
 
-function setup_iterm2() {
-    brew cask install iterm2
-    cp init/com.googlecode.iterm2.plist ~/Library/Preferences
+function setup_homebrew() {
+    
+    if [ ! `which brew` ]; then
+        /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+    fi
+    brew update
+    brew upgrade
+    brew cleanup
 }
 
-function setup_virtualbox() {
-    brew cask install virtualbox
-    read -p "Go to Security & Privacy settings and approve the Oracle extensions. Press any key to continue... "
-    brew cask install virtualbox
+function setup_bash() {
 
-    brew cask install virtualbox-extension-pack
+    # Install 4.x
+    brew install bash
+
+    # add it to shells
+    if ! fgrep -q '/usr/local/bin/bash' /etc/shells; then
+        echo '/usr/local/bin/bash' | sudo tee -a /etc/shells
+    fi
+    if [ $SHELL != '/usr/local/bin/bash' ]; then
+        sudo chsh -s /usr/local/bin/bash $(whoami)
+    fi
+        
+}
+
+function setup_brewapps() {
+
+    for app in ${BREWAPPS[@]}; do
+        brew install $app
+    done
 }
 
 function setup_repo() {
@@ -64,25 +82,17 @@ function setup_repo() {
     . ~/.bash_profile
 }
 
-function setup_homebrew() {
-    
-    if [ ! `which brew` ]; then
-        /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
-    fi
-    brew update
-    brew upgrade
-    brew cleanup
+function setup_iterm2() {
+    brew cask install iterm2
+    cp init/com.googlecode.iterm2.plist ~/Library/Preferences
 }
 
-function setup_bash() {
+function setup_virtualbox() {
+    brew cask install virtualbox
+    read -p "Go to Security & Privacy settings and approve the Oracle extensions. Press any key to continue... "
+    brew cask install virtualbox
 
-    if ! fgrep -q '/usr/local/bin/bash' /etc/shells; then
-        echo '/usr/local/bin/bash' | sudo tee -a /etc/shells
-    fi
-    if [ $SHELL != '/usr/local/bin/bash' ]; then
-        sudo chsh -s /usr/local/bin/bash $(whoami)
-    fi
-        
+    brew cask install virtualbox-extension-pack
 }
 
 function setup_python() {
@@ -91,13 +101,6 @@ function setup_python() {
     pip install virtualenvwrapper
 }
 
-
-function setup_brewapps() {
-
-    for app in ${BREWAPPS[@]}; do
-        brew install $app
-    done
-}
 
 function setup_caskapps() {
 
