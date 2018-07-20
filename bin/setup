@@ -85,6 +85,7 @@ function setup_repo() {
 function setup_iterm2() {
     brew cask install iterm2
     cp init/com.googlecode.iterm2.plist ~/Library/Preferences
+    chmod 600 ~/Library/Preferences/com.googlecode.iterm2.plist
 }
 
 function setup_virtualbox() {
@@ -115,11 +116,15 @@ function setup_system() {
     sudo nvram SystemAudioVolume=" "
     
     # screensaver prefs
+
+    # make sure no prefs are hiding in memory
+    osascript -e 'tell application "System Preferences" to quit'
+    killall cfprefsd
+
     defaults write com.apple.screensaver askForPassword -int 1
     defaults write com.apple.screensaver askForPasswordDelay 1200
     defaults write com.apple.screensaver idleTime 120
-    defaults read com.apple.screensaver >/dev/null
-    osascript -e 'tell application "System Preferences" to quit'
+
 
 
     # Device Preferences
@@ -136,9 +141,7 @@ function setup_system() {
     defaults write NSGlobalDomain NSQuitAlwaysKeepsWindows '<true/>'
 
     # General tab: use dark menu bar and dock
-    defaults write .GlobalPreferences AppleInterfaceStyle -string Dark
-
-    killall cfprefsd
+    defaults write NSGlobalDomain AppleInterfaceStyle -string Dark
 }
 
 function setup_appstore() {
