@@ -143,6 +143,10 @@
 (setq desktop-path '("~/.emacs.d"))
 (setq desktop-save 't)
 
+;; shrink the font on small screen
+(if (<= (display-pixel-height) 900)
+    (set-default-font "Menlo 11"))
+
 ;; hide the startup message
 (setq inhibit-startup-message t)
 
