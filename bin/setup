@@ -135,11 +135,18 @@ function setup_system() {
     defaults write com.apple.driver.AppleBluetoothMultitouch.trackpad Clicking -bool true # tap to click
     defaults -currentHost write NSGlobalDomain com.apple.mouse.tapBehavior -int 1
 
+    #
+    # Menu bar stuff
+    #
+    
     # Clock Display (add date and seconds)
     defaults write com.apple.menuextra.clock DateFormat -string "EEE MMM d  h:mm:ss a"
 
     # Show battery percentage
     defaults write com.apple.menuextra.battery ShowPercent YES
+
+    # Restart the menu bar
+    killall SystemUIServer
     
     # General Preferences: preserve windows when closing an app
     defaults write NSGlobalDomain NSQuitAlwaysKeepsWindows '<true/>'
