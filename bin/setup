@@ -4,15 +4,15 @@ CALLS=(
     homebrew
     bash
     brewapps
-    repo
-    iterm2
     python
+    iterm2
     caskapps
     system
     terminal
     finder
     dock
     appstore
+    repo
 )
 
 BREWAPPS=(
@@ -138,6 +138,9 @@ function setup_system() {
     # Clock Display (add date and seconds)
     defaults write com.apple.menuextra.clock DateFormat -string "EEE MMM d  h:mm:ss a"
 
+    # Show battery percentage
+    defaults write com.apple.menuextra.battery ShowPercent YES
+    
     # General Preferences: preserve windows when closing an app
     defaults write NSGlobalDomain NSQuitAlwaysKeepsWindows '<true/>'
 
