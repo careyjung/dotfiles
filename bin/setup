@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+# setup calls, in order
+# NB: order is significant b/c of dependencies
 CALLS=(
     homebrew
     bash
@@ -15,6 +17,7 @@ CALLS=(
     repo
 )
 
+# installed in setup_brewapps
 BREWAPPS=(
     coreutils
     diffutils
@@ -25,6 +28,7 @@ BREWAPPS=(
     tmux
 )
 
+# installed in setup_caskapps
 CASKAPPS=(
     homebrew/cask/gpg-suite
     homebrew/cask-drivers/logitech-options
@@ -65,6 +69,7 @@ function setup_brewapps() {
 
     for app in ${BREWAPPS[@]}; do
         brew install $app
+        sudo -v
     done
 }
 
@@ -321,12 +326,11 @@ fi
 # run everything from homedir. (will probably work regardless, but I'm not sure)
 cd ~
 
-
 for call in ${CALLS[@]}; do
 
-    # Enable sudo ahead of time
+    # set/refresh sudo timestamp
     sudo -v
-    
+
     echo Setting up ${call}
     setup_${call}
     if [ $interactive ]; then
@@ -337,4 +341,6 @@ Press any key to continue... "
     fi
 done
 
+# Reset sudo timestamp and exit
+sudo -K
 exit 0
