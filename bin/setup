@@ -127,20 +127,29 @@ function setup_system() {
     defaults write com.apple.screensaver idleTime 120
 
 
-
     # Device Preferences
-    defaults write NSGlobalDomain KeyRepeat -int 2				# fast repeat
-    defaults write NSGlobalDomain InitialKeyRepeat -int 15			# no delay
-    defaults write NSGlobalDomain com.apple.trackpad.scaling -int 3		# fast tracking
-    defaults write com.apple.driver.AppleBluetoothMultitouch.trackpad Clicking -bool true # tap to click
-    defaults -currentHost write NSGlobalDomain com.apple.mouse.tapBehavior -int 1
+
+    # fast key repeat
+    defaults write NSGlobalDomain KeyRepeat -int 2
+
+    # no keypress delay
+    defaults write NSGlobalDomain InitialKeyRepeat -int 15
+
+    # fast tracking
+    defaults write NSGlobalDomain com.apple.trackpad.scaling -int 3
+    # tap to click
+    defaults write com.apple.driver.AppleBluetoothMultitouch.trackpad \
+             Clicking -bool true
+    defaults -currentHost write NSGlobalDomain \
+             com.apple.mouse.tapBehavior -int 1
 
     #
     # Menu bar stuff
     #
     
     # Clock Display (add date and seconds)
-    defaults write com.apple.menuextra.clock DateFormat -string "EEE MMM d  h:mm:ss a"
+    defaults write com.apple.menuextra.clock DateFormat \
+             -string "EEE MMM d  h:mm:ss a"
 
     # Show battery percentage
     defaults write com.apple.menuextra.battery ShowPercent YES
@@ -149,10 +158,14 @@ function setup_system() {
     killall SystemUIServer
     
     # General Preferences: preserve windows when closing an app
-    defaults write NSGlobalDomain NSQuitAlwaysKeepsWindows '<true/>'
+    defaults write NSGlobalDomain NSQuitAlwaysKeepsWindows -boolean true
 
     # General tab: use dark menu bar and dock
     defaults write NSGlobalDomain AppleInterfaceStyle -string Dark
+
+    # Security & Privacy pane
+    # Turn firewall on
+    sudo defaults write /Library/Preferences/com.apple.alf globalstate -int 1
 }
 
 function setup_appstore() {
@@ -179,9 +192,6 @@ function setup_appstore() {
 
     # Install System data files & security updates
     sudo defaults write com.apple.SoftwareUpdate CriticalUpdateInstall -int 1
-
-    # Automatically download apps purchased on other Macs
-    sudo defaults write com.apple.SoftwareUpdate ConfigDataInstall -int 1
 
     # Turn on app auto-update
     sudo defaults write com.apple.commerce AutoUpdate -bool true
@@ -237,6 +247,8 @@ function setup_dock() {
 
 function setup_finder() {
 
+    killall cfprefsd
+
     # Finder Preferences:
     # - hide files from Desktop
     defaults write com.apple.finder CreateDesktop false
@@ -254,7 +266,6 @@ function setup_finder() {
     # Disable the warning before emptying the Trash
     defaults write com.apple.finder WarnOnEmptyTrash -bool false
 
-    killall cfprefsd
     killall Finder
 }
 
