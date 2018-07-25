@@ -26,6 +26,7 @@ BREWAPPS=(
     nmap
     sass/sass/sass
     tmux
+    heroku
 )
 
 # installed in setup_caskapps
@@ -77,6 +78,7 @@ function setup_repo() {
 
     tar xvf Documents/Keys/ssh.tar
     tar xvf Documents/Keys/gnupg.tar
+    tar xvf Documents/Keys/netrc.tar
 
     if [ ! -d .git ]; then
         git init

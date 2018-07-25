@@ -3,25 +3,23 @@
 #
 
 
-# ignore Emacs config dir, except for init.el
 .emacs.d/
 !.emacs.d/init.el
 
-# ignore .ssh except for config
 .ssh/
 !.ssh/config
 
-# ignore ~/Library, except for iterm2 prefs file 
 Library/
 !Library/Preferences/com.googlecode.iterm2.plist
 
-# everything else
+# ignore everything else
 .bash_history
 .bash_sessions/
 .cups/
 .gnupg/
 .gnupg_pre_2.1/
 .lesshst
+.netrc
 .python_history
 .viminfo
 Applications/
