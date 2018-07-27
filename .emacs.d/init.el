@@ -145,7 +145,8 @@
 
 ;; shrink the font on small screen
 (if (<= (display-pixel-height) 900)
-    (set-default-font "Menlo 11"))
+    (set-default-font "Monaco 11")
+    (set-default-font "Monaco 12"))
 
 ;; hide the startup message
 (setq inhibit-startup-message t)
@@ -155,6 +156,9 @@
 
 ;; disable tool bar
 (tool-bar-mode -1)
+
+;; cursor type
+(setq-default cursor-type 'bar)
 
 ;; don't leave any "~" turds lying around
 (setq make-backup-files nil)
