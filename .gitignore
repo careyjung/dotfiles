@@ -2,15 +2,20 @@
 # 'dotfiles' gitignore file (not to be confused with system ignore file)
 #
 
-
+# ignore emacs config dir, except for init.el
 .emacs.d/
 !.emacs.d/init.el
+
+# ignore emacs recovery files (begin and end with '#')
+\#*#
+
 
 .ssh/
 !.ssh/config
 
 Library/
 !Library/Preferences/com.googlecode.iterm2.plist
+
 
 # ignore everything else
 .bash_history

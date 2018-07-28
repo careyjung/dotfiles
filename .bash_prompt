@@ -11,18 +11,9 @@ elif infocmp xterm-256color >/dev/null 2>&1; then
     export TERM='xterm-256color'
 fi
 
-git_prompt() {
-    if [ $(git status -s 2>/dev/null|wc -l) = 0 ]; then
-        echo '$'
-    else
-        echo '!'
-    fi
-}
-
 if tput setaf 1 &> /dev/null; then
     tput sgr0; # reset colors
     reset=$(tput sgr0);
-    blink=$(tput blink);
     bold=$(tput bold);
     # Solarized colors, taken from http://git.io/solarized-colors.
     black=$(tput setaf 0);
@@ -50,6 +41,14 @@ else
     yellow="\e[1;33m";
 fi;
 
+git_prompt() {
+    if [ $(git status -s 2>/dev/null|wc -l) = 0 ]; then
+        echo '$ '
+    else
+        echo $(tput smul)'$'$(tput rmul)' '
+    fi
+}
+
 # Highlight the user name when logged in as root.
 if [[ "${USER}" == "root" ]]; then
     userStyle="${red}";
@@ -64,19 +63,18 @@ else
     hostStyle="${yellow}";
 fi;
 
-# Set the terminal title and prompt.
-PS1="\[\033]0;\w\007\]"; # working directory base name
+# Display working dir in title bar
+PS1="\[\033]0;\w\007\]";
+
 #PS1+="\[${bold}\]"; # newline
 #PS1+="\[${userStyle}\]\u"; # username
 #PS1+="\[${white}\] @ ";
 #PS1+="\[${hostStyle}\]\h"; # host
 #PS1+="\[${white}\] in ";
 #PS1+="\[${green}\]\w"; # working directory full path
-#PS1+="\$(prompt_git \"\[${white}\] on \[${violet}\]\" \"\[${blue}\]\")"; # Git repository details
-PS1+="\[${white}\]\$(git_prompt) \[${reset}\]"; # `$` (and reset color)
 
-#PS1+="\n";
-
+# Highlight when there are git changes
+PS1+="\[${white}\]\$ \[${reset}\]"; # `$` (and reset color)
 export PS1;
 
 PS2="\[${yellow}\]→ \[${reset}\]";
