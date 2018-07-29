@@ -98,8 +98,15 @@ function setup_iterm2() {
 
 function setup_virtualbox() {
     brew cask install virtualbox
-    read -p "Go to Security & Privacy settings and approve the Oracle extensions. Press any key to continue... "
-    brew cask install virtualbox
+
+    # work around a bug in virtualbox install. Attempt install once,
+    # then load all four kernel extensions, approve them, then install
+    # again.
+    ~/bin/virtualboxkext load
+    read -t 60 -p "Open Security & Privacy settings and approve the Oracle extensions (four times). Press 'd' when done or any other key to skip. Waiting 60 seconds...: " answer
+    if [ "$answer" = "d" ]; then
+        brew cask install virtualbox
+    fi
 
     brew cask install virtualbox-extension-pack
 }

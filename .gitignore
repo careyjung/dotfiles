@@ -26,6 +26,7 @@ Library/
 .lesshst
 .netrc
 .python_history
+.vagrant.d/
 .viminfo
 Applications/
 Desktop/
@@ -35,5 +36,6 @@ Movies/
 Music/
 Pictures/
 Public/
+VirtualBox VMs/
 dotfiles/
 tmp/
