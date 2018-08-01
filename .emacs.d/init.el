@@ -144,7 +144,7 @@
 (setq desktop-save 't)
 
 ;; shrink the font on small screen
-(if (<= (display-pixel-height) 1050)
+(if (<= (display-pixel-height) 900)
     (set-default-font "Monaco 11")
     (set-default-font "Monaco 12"))
 
