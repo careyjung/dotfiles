@@ -1,18 +1,23 @@
 #
-# 'dotfiles' gitignore file (not to be confused with system ignore file)
+# .gitignore for 'dotfiles' repo (not to be confused with system ignore file under .config/
 #
 
-# ignore emacs config dir, except for init.el
+#
+# Emacs: ignore recovery files '#*#' and the .emacs.d dir, except for init.el
+#
+\#*\#
 .emacs.d/
 !.emacs.d/init.el
 
-# ignore emacs recovery files (begin and end with '#')
-\#*#
-
-
+#
+# ssh: Exclude everything in .ssh/ (contains secret keys), except for config file
+# 
 .ssh/
 !.ssh/config
 
+#
+# Prefs: ignore everything excep iterm2 preferences file
+#
 Library/
 !Library/Preferences/com.googlecode.iterm2.plist
 
@@ -27,6 +32,7 @@ Library/
 .netrc
 .python_history
 .vagrant.d/
+.vim/.netrwhist
 .viminfo
 Applications/
 Desktop/
