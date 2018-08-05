@@ -39,6 +39,7 @@ CASKAPPS=(
     sketchup-pro
     whatsapp
     slack
+    messenger
 )
 
 function setup_homebrew() {
