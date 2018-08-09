@@ -40,6 +40,7 @@ CASKAPPS=(
     whatsapp
     slack
     messenger
+    google-chat
 )
 
 function setup_homebrew() {
