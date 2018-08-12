@@ -1,5 +1,13 @@
 #!/usr/bin/env bash
 
+#
+# Apps to be installed, in order, along with their installation method. To add another
+#    app to the setup, insert its name in the list, specify its method, and define
+# 
+#	'setup' -> invokes "setup_${app}", if defined, error otherwise
+#	'cask' -> invokes "brew cask install ${app}"
+#	'' (blank) -> invokes "brew install ${app}"
+#
 APPS=(
     homebrew:setup
     bash:setup
@@ -8,11 +16,12 @@ APPS=(
     git
     dockutil
     nmap
-    sass
+    sass:setup
     tmux
     heroku
     python:setup
     iterm2:setup
+    gcloud:setup
     system:setup
     terminal:setup
     finder:setup
@@ -20,19 +29,32 @@ APPS=(
     appstore:setup
     repo:setup
     gpg-suite:cask
-    logitech-options:cask
+    logitech-options:setup
     emacs:cask
     google-chrome:cask
-    marshallofsound-google-play-music-player:cask
+    google-play:setup
     sketchup-pro:cask
     whatsapp:cask
     slack:cask
     messenger:cask
     google-chat:cask
-    google-cloud-sdk:setup
 )
 
-function setup_google-cloud-sdk() {
+
+
+function setup_google-player() {
+    brew cask install marshall-of-sound-google-play-music-player
+}
+
+function setup_sass() {
+    brew install sass/sass/sass
+}
+
+function setup_logitech-options() {
+    brew cask install homebrew/cask-drivers/logitech-options
+}
+
+function setup_gcloud() {
     brew cask install google-cloud-sdk
     tar xvf ~/Documents/Keys/gcloud.tar
 }
