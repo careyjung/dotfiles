@@ -24,6 +24,9 @@ Library/
 #
 # gcloud
 #
+.config/gcloud/credentials.db
+.config/gcloud/access_tokens.db
+.config/gcloud/legacy_credentials/
 .config/gcloud/logs/
 
 
