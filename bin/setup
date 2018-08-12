@@ -29,6 +29,7 @@ APPS=(
     slack:cask
     messenger:cask
     google-chat:cask
+    google-cloud-sdk:cask
 )
 
 function setup_homebrew() {

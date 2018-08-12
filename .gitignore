@@ -21,6 +21,11 @@
 Library/
 !Library/Preferences/com.googlecode.iterm2.plist
 
+#
+# gcloud
+#
+.config/gcloud/logs/
+
 
 # ignore everything else
 .bash_history
@@ -46,3 +51,4 @@ VirtualBox VMs/
 dotfiles/
 fullstack/
 tmp/
+
