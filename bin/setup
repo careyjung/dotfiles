@@ -1,46 +1,34 @@
 #!/usr/bin/env bash
 
-# setup calls, in order
-# NB: order is significant b/c of dependencies
-CALLS=(
-    homebrew
-    bash
-    brewapps
-    python
-    iterm2
-    caskapps
-    system
-    terminal
-    finder
-    dock
-    appstore
-    repo
-)
-
-# installed in setup_brewapps
-BREWAPPS=(
+APPS=(
+    homebrew:setup
+    bash:setup
     coreutils
     diffutils
     git
     dockutil
     nmap
-    sass/sass/sass
+    sass
     tmux
     heroku
-)
-
-# installed in setup_caskapps
-CASKAPPS=(
-    homebrew/cask/gpg-suite
-    homebrew/cask-drivers/logitech-options
-    google-chrome
-    marshallofsound-google-play-music-player
-    emacs
-    sketchup-pro
-    whatsapp
-    slack
-    messenger
-    google-chat
+    python:setup
+    iterm2:setup
+    system:setup
+    terminal:setup
+    finder:setup
+    dock:setup
+    appstore:setup
+    repo:setup
+    gpg-suite:cask
+    logitech-options:cask
+    emacs:cask
+    google-chrome:cask
+    marshallofsound-google-play-music-player:cask
+    sketchup-pro:cask
+    whatsapp:cask
+    slack:cask
+    messenger:cask
+    google-chat:cask
 )
 
 function setup_homebrew() {
@@ -68,63 +56,16 @@ function setup_bash() {
         
 }
 
-function setup_brewapps() {
-
-    for app in ${BREWAPPS[@]}; do
-        brew install $app
-        sudo -v
-    done
-}
-
-function setup_repo() {
-
-    tar xvf Documents/Keys/ssh.tar
-    tar xvf Documents/Keys/gnupg.tar
-    tar xvf Documents/Keys/netrc.tar
-
-    if [ ! -d .git ]; then
-        git init
-        git remote add origin git@github.com:careyjung/dotfiles.git
-        git fetch
-        git checkout origin/master --force --track
-    fi
-
-    . ~/.bash_profile
-}
-
-function setup_iterm2() {
-    brew cask install iterm2
-    cp init/com.googlecode.iterm2.plist ~/Library/Preferences
-    chmod 600 ~/Library/Preferences/com.googlecode.iterm2.plist
-}
-
-function setup_virtualbox() {
-    brew cask install virtualbox
-
-    # work around a bug in virtualbox install. Attempt install once,
-    # then load all four kernel extensions, approve them, then install
-    # again.
-    ~/bin/virtualboxkext load
-    read -t 60 -p "Open Security & Privacy settings and approve the Oracle extensions (four times). Press 'd' when done or any other key to skip. Waiting 60 seconds...: " answer
-    if [ "$answer" = "d" ]; then
-        brew cask install virtualbox
-    fi
-
-    brew cask install virtualbox-extension-pack
-}
-
 function setup_python() {
     brew install python
     brew install python2
     pip install virtualenvwrapper
 }
 
-
-function setup_caskapps() {
-
-    for app in ${CASKAPPS[@]}; do
-        brew cask install $app
-    done
+function setup_iterm2() {
+    brew cask install iterm2
+    cp init/com.googlecode.iterm2.plist ~/Library/Preferences
+    chmod 600 ~/Library/Preferences/com.googlecode.iterm2.plist
 }
 
 function setup_system() {
@@ -187,43 +128,53 @@ function setup_system() {
     sudo defaults write /Library/Preferences/com.apple.alf globalstate -int 1
 }
 
-function setup_appstore() {
+function setup_terminal() {
 
-    # NB: the softwareupdate command below is the only one that seems
-    # to have any effect on system settings
+    # delete existing Solarized Dark profile, if it exists
+    /usr/libexec/PlistBuddy ~/Library/Preferences/com.apple.Terminal.plist -x -c \
+                            "delete ':Window Settings:Solarized Dark'" 2>/dev/null
 
-    # These supposedly need to run as root
-    sudo softwareupdate --schedule off
+    # add back the key
+    /usr/libexec/PlistBuddy ~/Library/Preferences/com.apple.Terminal.plist -x -c \
+                            "add ':Window Settings:Solarized Dark' dict"
 
-    # Enable the WebKit Developer Tools in the Mac App Store
-    sudo defaults write com.apple.appstore WebKitDeveloperExtras -bool true
+    # import previously saved Terminal preferences
+    /usr/libexec/PlistBuddy ~/Library/Preferences/com.apple.Terminal.plist -x -c \
+                            "merge '/Users/careyjung/init/Solarized Dark.terminal' ':Window Settings:Solarized Dark'"
 
-    # Enable Debug Menu in the Mac App Store
-    sudo defaults write com.apple.appstore ShowDebugMenu -bool true
+    # make them the default
+    /usr/libexec/PlistBuddy ~/Library/Preferences/com.apple.Terminal.plist -x -c \
+                            "set ':Default Window Settings' 'Solarized Dark'"
+    /usr/libexec/PlistBuddy ~/Library/Preferences/com.apple.Terminal.plist -x -c \
+                            "set ':Startup Window Settings' 'Solarized Dark'"
 
-    # Enable the automatic update check
-    sudo defaults write com.apple.SoftwareUpdate \
-         AutomaticCheckEnabled -boolean true
-    # Check for software updates daily, not just once per week
-    sudo defaults write com.apple.SoftwareUpdate ScheduleFrequency -int 1
-
-    # Download newly available updates in background
-    sudo defaults write com.apple.SoftwareUpdate AutomaticDownload -int 1
-
-    # Install System data files & security updates
-    sudo defaults write com.apple.SoftwareUpdate CriticalUpdateInstall -int 1
-
-    # Turn on app auto-update
-    sudo defaults write com.apple.commerce AutoUpdate -bool true
-
-    # Turn on OS auto-updates
-    sudo defaults write com.apple.commerce \
-         AutoUpdateRestartRequired -bool true
-
-    sudo softwareupdate --schedule on
-
+    # flush the plist cache
+    killall cfprefsd
 }
 
+function setup_finder() {
+
+    killall cfprefsd
+
+    # Finder Preferences:
+    # - hide files from Desktop
+    defaults write com.apple.finder CreateDesktop false
+
+    # Full POSIX path in Title bar
+    defaults write com.apple.finder _FXShowPosixPathInTitle -bool true
+
+    # Keep folders on top when sorting by name
+    # defaults write com.apple.finder _FXSortFoldersFirst -bool true
+
+    # Use list view in all Finder windows by default
+    # Four-letter codes for the other view modes: `icnv`, `clmv`, `Flwv`
+    defaults write com.apple.finder FXPreferredViewStyle -string "clmv"
+
+    # Disable the warning before emptying the Trash
+    defaults write com.apple.finder WarnOnEmptyTrash -bool false
+
+    killall Finder
+}
 
 function setup_dock() {
     [ $(which dockutil) ] || brew install dockutil
@@ -267,94 +218,89 @@ function setup_dock() {
     dockutil --remove all
 }
 
-function setup_finder() {
+function setup_appstore() {
 
-    killall cfprefsd
+    # NB: the softwareupdate command below is the only one that seems
+    # to have any effect on system settings
 
-    # Finder Preferences:
-    # - hide files from Desktop
-    defaults write com.apple.finder CreateDesktop false
+    # These supposedly need to run as root
+    sudo softwareupdate --schedule off
 
-    # Full POSIX path in Title bar
-    defaults write com.apple.finder _FXShowPosixPathInTitle -bool true
+    # Enable the WebKit Developer Tools in the Mac App Store
+    sudo defaults write com.apple.appstore WebKitDeveloperExtras -bool true
 
-    # Keep folders on top when sorting by name
-    # defaults write com.apple.finder _FXSortFoldersFirst -bool true
+    # Enable Debug Menu in the Mac App Store
+    sudo defaults write com.apple.appstore ShowDebugMenu -bool true
 
-    # Use list view in all Finder windows by default
-    # Four-letter codes for the other view modes: `icnv`, `clmv`, `Flwv`
-    defaults write com.apple.finder FXPreferredViewStyle -string "clmv"
+    # Enable the automatic update check
+    sudo defaults write com.apple.SoftwareUpdate \
+         AutomaticCheckEnabled -boolean true
+    # Check for software updates daily, not just once per week
+    sudo defaults write com.apple.SoftwareUpdate ScheduleFrequency -int 1
 
-    # Disable the warning before emptying the Trash
-    defaults write com.apple.finder WarnOnEmptyTrash -bool false
+    # Download newly available updates in background
+    sudo defaults write com.apple.SoftwareUpdate AutomaticDownload -int 1
 
-    killall Finder
+    # Install System data files & security updates
+    sudo defaults write com.apple.SoftwareUpdate CriticalUpdateInstall -int 1
+
+    # Turn on app auto-update
+    sudo defaults write com.apple.commerce AutoUpdate -bool true
+
+    # Turn on OS auto-updates
+    sudo defaults write com.apple.commerce \
+         AutoUpdateRestartRequired -bool true
+
+    sudo softwareupdate --schedule on
+
 }
 
-function setup_terminal() {
+function setup_repo() {
 
-    # delete existing Solarized Dark profile, if it exists
-    /usr/libexec/PlistBuddy ~/Library/Preferences/com.apple.Terminal.plist -x -c \
-                            "delete ':Window Settings:Solarized Dark'" 2>/dev/null
+    tar xvf Documents/Keys/ssh.tar
+    tar xvf Documents/Keys/gnupg.tar
+    tar xvf Documents/Keys/netrc.tar
 
-    # add back the key
-    /usr/libexec/PlistBuddy ~/Library/Preferences/com.apple.Terminal.plist -x -c \
-                            "add ':Window Settings:Solarized Dark' dict"
+    if [ ! -d .git ]; then
+        git init
+        git remote add origin git@github.com:careyjung/dotfiles.git
+        git fetch
+        git checkout origin/master --force --track
+    fi
 
-    # import previously saved Terminal preferences
-    /usr/libexec/PlistBuddy ~/Library/Preferences/com.apple.Terminal.plist -x -c \
-                            "merge '/Users/careyjung/init/Solarized Dark.terminal' ':Window Settings:Solarized Dark'"
-
-    # make them the default
-    /usr/libexec/PlistBuddy ~/Library/Preferences/com.apple.Terminal.plist -x -c \
-                            "set ':Default Window Settings' 'Solarized Dark'"
-    /usr/libexec/PlistBuddy ~/Library/Preferences/com.apple.Terminal.plist -x -c \
-                            "set ':Startup Window Settings' 'Solarized Dark'"
-
-    # flush the plist cache
-    killall cfprefsd
+    . ~/.bash_profile
 }
 
-###########################################################################
-# main
-###########################################################################
+function setup_virtualbox() {
+    brew cask install virtualbox
 
-while getopts ":hid" opt; do
-  case ${opt} in
-    i ) interactive=1
-      ;;
-    h ) lst=$( IFS='|'; echo "Usage: $0 [-i] [${CALLS[*]}]"); echo $lst; exit 0
-      ;;
-    \? ) lst=$( IFS='|'; echo "Usage: $0 [-i] [${CALLS[*]}]"); echo $lst; exit 1
-      ;;
-  esac
-done
-shift $((OPTIND -1))
+    # work around a bug in virtualbox install. Attempt install once,
+    # then load all four kernel extensions, approve them, then install
+    # again.
+    ~/bin/virtualboxkext load
+    read -t 60 -p "Open Security & Privacy settings and approve the Oracle extensions (four times). Press 'd' when done or any other key to skip. Waiting 60 seconds...: " answer
+    if [ "$answer" = "d" ]; then
+        brew cask install virtualbox
+    fi
 
-# if specified on the command line, only do those setups
-if [ $# -gt 0 ]; then
-    unset CALLS
-    CALLS=$@
-fi
+    brew cask install virtualbox-extension-pack
+}
 
-# run everything from homedir. (will probably work regardless, but I'm not sure)
 cd ~
+for appspec in ${APPS[@]}; do
+    app=${appspec/:*/}
+    cmd=${appspec/*:/}
 
-for call in ${CALLS[@]}; do
-
-    # set/refresh sudo timestamp
     sudo -v
-
-    echo Setting up ${call}
-    setup_${call}
-    if [ $interactive ]; then
-        read -p "Done setting up ${call}.
-Press any key to continue... "
+    if [[ "${cmd}" = "${app}" ]]; then
+        brew install ${app}
+    elif [[ "${cmd}" = "setup" ]]; then
+        setup_${app}
+    elif [[ "${cmd}" = "cask" ]]; then
+        brew cask install ${app}
     else
-        echo Done setting up ${call}.
+        echo "App specification error, app=$appspec"
     fi
 done
 
-# Reset sudo timestamp and exit
-sudo -K
-exit 0
+
