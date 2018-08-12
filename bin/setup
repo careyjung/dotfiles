@@ -29,8 +29,13 @@ APPS=(
     slack:cask
     messenger:cask
     google-chat:cask
-    google-cloud-sdk:cask
+    google-cloud-sdk:setup
 )
+
+function setup_google-cloud-sdk() {
+    brew cask install google-cloud-sdk
+    tar xvf ~/Documents/Keys/gcloud.tar
+}
 
 function setup_homebrew() {
     
@@ -286,6 +291,26 @@ function setup_virtualbox() {
 
     brew cask install virtualbox-extension-pack
 }
+
+
+#
+# Main code
+#
+while getopts ":hid" opt; do
+  case ${opt} in
+    h ) lst=$( IFS='|'; echo "Usage: $0 [${APPS[*]}]"); echo $lst; exit 0
+      ;;
+    \? ) lst=$( IFS='|'; echo "Usage: $0 [${APPS[*]}]"); echo $lst; exit 1
+      ;;
+  esac
+done
+shift $((OPTIND -1))
+
+# if specified on the command line, only do those setups
+if [ $# -gt 0 ]; then
+    unset APPS
+    APPS=$@
+fi
 
 cd ~
 for appspec in ${APPS[@]}; do
