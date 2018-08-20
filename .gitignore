@@ -21,21 +21,13 @@
 Library/
 !Library/Preferences/com.googlecode.iterm2.plist
 
-#
-# gcloud
-#
-.config/gcloud/credentials.db
-.config/gcloud/access_tokens.db
-.config/gcloud/legacy_credentials/
-.config/gcloud/logs/
-
-
 # ignore everything else
 .bash_history
 .bash_sessions/
 .cups/
 .gnupg/
 .gnupg_pre_2.1/
+.gsutil/
 .lesshst
 .netrc
 .python_history
