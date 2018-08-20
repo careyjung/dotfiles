@@ -9,53 +9,42 @@
 #	'' (blank) -> invokes "brew install ${app}"
 #
 APPS=(
-    homebrew:setup
-    bash:setup
+    homebrew
+    bash
     coreutils
     diffutils
     git
-    dockutil
+    dotfiles
     nmap
-    sass:setup
+    sass/sass/sass
     tmux
     heroku
-    python:setup
-    iterm2:setup
-    gcloud:setup
-    system:setup
-    terminal:setup
-    finder:setup
-    dock:setup
-    appstore:setup
-    repo:setup
-    gpg-suite:cask
-    logitech-options:setup
-    emacs:cask
-    google-chrome:cask
-    google-play:setup
-    sketchup-pro:cask
-    whatsapp:cask
-    slack:cask
-    messenger:cask
-    google-chat:cask
+    python
+    python@2
+    iterm2
+    google-cloud-sdk
+    dockutil
+    system
+    terminal
+    finder
+    dock
+    appstore
+    gpg-suite
+    logitech-options
+    emacs
+    google-chrome
+    marshallofsound-google-play-music-player
+    sketchup-pro
+    whatsapp
+    slack
+    messenger
+    google-chat
+    virtualbox
+    virtualbox-extension-pack
 )
 
 
-
-function setup_google-player() {
-    brew cask install marshall-of-sound-google-play-music-player
-}
-
-function setup_sass() {
-    brew install sass/sass/sass
-}
-
-function setup_logitech-options() {
-    brew cask install homebrew/cask-drivers/logitech-options
-}
-
-function setup_gcloud() {
-    brew cask install google-cloud-sdk
+function setup_google-cloud-sdk() {
     tar xvf ~/Documents/Keys/gcloud.tar
 }
 
@@ -84,9 +73,7 @@ function setup_bash() {
         
 }
 
-function setup_python() {
-    brew install python
-    brew install python2
+function setup_python@2() {
     pip install virtualenvwrapper
 }
 
@@ -158,6 +145,9 @@ function setup_system() {
 
 function setup_terminal() {
 
+    # flush the plist cache
+    killall cfprefsd
+
     # delete existing Solarized Dark profile, if it exists
     /usr/libexec/PlistBuddy ~/Library/Preferences/com.apple.Terminal.plist -x -c \
                             "delete ':Window Settings:Solarized Dark'" 2>/dev/null
@@ -176,8 +166,6 @@ function setup_terminal() {
     /usr/libexec/PlistBuddy ~/Library/Preferences/com.apple.Terminal.plist -x -c \
                             "set ':Startup Window Settings' 'Solarized Dark'"
 
-    # flush the plist cache
-    killall cfprefsd
 }
 
 function setup_finder() {
@@ -205,7 +193,6 @@ function setup_finder() {
 }
 
 function setup_dock() {
-    [ $(which dockutil) ] || brew install dockutil
 
     # Dock Preferences
     # Hot corners:
@@ -283,11 +270,7 @@ function setup_appstore() {
 
 }
 
-function setup_repo() {
-
-    tar xvf Documents/Keys/ssh.tar
-    tar xvf Documents/Keys/gnupg.tar
-    tar xvf Documents/Keys/netrc.tar
+function setup_dotfiles() {
 
     if [ ! -d .git ]; then
         git init
@@ -297,11 +280,13 @@ function setup_repo() {
     fi
 
     . ~/.bash_profile
+
+    tar xvf Documents/Keys/ssh.tar
+    tar xvf Documents/Keys/gnupg.tar
+    tar xvf Documents/Keys/netrc.tar
 }
 
 function setup_virtualbox() {
-    brew cask install virtualbox
-
     # work around a bug in virtualbox install. Attempt install once,
     # then load all four kernel extensions, approve them, then install
     # again.
@@ -310,8 +295,6 @@ function setup_virtualbox() {
     if [ "$answer" = "d" ]; then
         brew cask install virtualbox
     fi
-
-    brew cask install virtualbox-extension-pack
 }
 
 
@@ -334,21 +317,28 @@ if [ $# -gt 0 ]; then
     APPS=$@
 fi
 
-cd ~
-for appspec in ${APPS[@]}; do
-    app=${appspec/:*/}
-    cmd=${appspec/*:/}
+casks=$(mktemp)
+brew search --casks > $casks
 
+brews=$(mktemp)
+brew search > $brews
+
+cd ~
+for app in ${APPS[@]}; do
     sudo -v
-    if [[ "${cmd}" = "${app}" ]]; then
-        brew install ${app}
-    elif [[ "${cmd}" = "setup" ]]; then
-        setup_${app}
-    elif [[ "${cmd}" = "cask" ]]; then
+    if egrep -qi "^${app}\$" $casks; then
         brew cask install ${app}
+        if [[ "$(type -t setup_${app})" = "function" ]]; then
+            setup_${app}
+        fi
+    elif egrep -qi "^${app}\$" $brews; then
+        brew install ${app}
+        if [[ "$(type -t setup_${app})" = "function" ]]; then
+            setup_${app}
+        fi
+    elif [[ "$(type -t setup_${app})" = "function" ]]; then
+        setup_${app}
     else
-        echo "App specification error, app=$appspec"
+        echo "No brew, cask, or setup_${app} found for ${app}"
     fi
 done
-
-
