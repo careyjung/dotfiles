@@ -348,9 +348,9 @@ function init_dotfiles() {
         git remote add origin git@github.com:careyjung/dotfiles.git
         git fetch
         git checkout origin/master --force --track
-
-        source ~/.bash_profile
     fi
+
+    source ~/.bash_profile
 }
 
 usage() {
