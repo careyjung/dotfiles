@@ -38,7 +38,7 @@ APPSPECS=(
     slack:cask
     messenger:cask
     google-chat:cask
-    virtualbox:cask,setup
+    virtualbox:cask
     virtualbox-extension-pack:cask
 )
 
@@ -280,21 +280,9 @@ function setup_git() {
     fi
 }
 
-function setup_virtualbox() {
-    # work around a bug in virtualbox install. Attempt install once,
-    # then load all four kernel extensions, approve them, then install
-    # again.
-    ~/bin/virtualboxkext load
-    read -t 60 -p "Open Security & Privacy settings and approve the Oracle extensions (four times). Press 'd' when done or any other key to skip. Waiting 60 seconds...: " answer
-    if [ "$answer" = "d" ]; then
-        brew cask install virtualbox
-    fi
-}
-
-
-#
-# Main code
-#
+###################################################################
+# Main
+###################################################################
 while getopts ":hid" opt; do
     case ${opt} in
         h) lst=$( IFS='|'; echo "Usage: $0 [-h] [${APPSPECS[*]}]"); echo $lst; exit 0
