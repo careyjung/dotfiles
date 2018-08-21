@@ -24,7 +24,7 @@ declare -A APPSPECS=(
     [diffutils]=brewit:bash
     [dock]=init:dockutil
     [dockutil]=brewit
-    [dotfiles]=init:git,gpg-suite,keys
+    [dotfiles]=init:git,gpg-suite,ssh
     [emacs]=caskit:dotfiles
     [finder]=init
     [git]=brewit:bash
@@ -32,10 +32,10 @@ declare -A APPSPECS=(
     [google-chrome]=caskit
     [google-cloud-sdk]=caskit:dotfiles
     [gpg-suite]=caskit,init
-    [heroku]=brewit
+    [heroku]=brewit,init
     [homebrew/cask-drivers/logitech-options]=caskit
     [iterm2]=caskit,init:dotfiles
-    [keys]=init
+    [ssh]=init
     [marshallofsound-google-play-music-player]=caskit
     [messenger]=caskit
     [nmap]=brewit
@@ -107,8 +107,11 @@ function process_app() {
     fi
 }
 
-function init_keys() {
+function init_ssh() {
     tar xvf Documents/Keys/ssh.tar
+}
+
+function init_heroku() {
     tar xvf Documents/Keys/netrc.tar
 }
 
