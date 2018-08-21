@@ -24,14 +24,14 @@ declare -A APPSPECS=(
     [diffutils]=brewit:bash
     [dock]=init:dockutil
     [dockutil]=brewit
-    [dotfiles]=init:git,gpg-suite
+    [dotfiles]=init:git,gpg-suite,keys
     [emacs]=caskit:dotfiles
     [finder]=init
     [git]=brewit:bash
     [google-chat]=caskit
     [google-chrome]=caskit
     [google-cloud-sdk]=caskit:dotfiles
-    [gpg-suite]=caskit
+    [gpg-suite]=caskit,init
     [heroku]=brewit
     [homebrew/cask-drivers/logitech-options]=caskit
     [iterm2]=caskit,init:dotfiles
@@ -105,6 +105,15 @@ function process_app() {
 
         RUNSTATUS[process_$1]="done"
     fi
+}
+
+function init_keys() {
+    tar xvf Documents/Keys/ssh.tar
+    tar xvf Documents/Keys/netrc.tar
+}
+
+function init_gpg-suite() {
+    tar xvf Documents/Keys/gnupg.tar
 }
 
 function init_homebrew() {
@@ -331,11 +340,7 @@ function init_appstore() {
 
 function init_dotfiles() {
 
-    if [ ! -d init ]; then
-        tar xvf Documents/Keys/ssh.tar
-        tar xvf Documents/Keys/gnupg.tar
-        tar xvf Documents/Keys/netrc.tar
-
+    if [ ! -d .git ]; then
         git init
         git remote add origin git@github.com:careyjung/dotfiles.git
         git fetch
