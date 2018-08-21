@@ -1,49 +1,113 @@
 #!/usr/bin/env bash
 
 #
-# Apps to be installed, in order, along with their installation method. To add another
-#    app to the setup, insert its name in the list, specify its method, and define
-# 
-#	'setup' -> invokes "setup_${app}", if defined, error otherwise
-#	'cask' -> invokes "brew cask install ${app}"
-#	'' (blank) -> invokes "brew install ${app}"
+# Add apps or initialization functions here.
+#   * Order is irrelevant, assuming dependencies are properly defined
+#   * Array keys are either homebrew apps or casks or locally
+#     defined init_$app functions.
+#   * Syntax for specs is "<commands>:<dependencies",
+#     where a command is a function taking one argument, the appname
 #
-APPSPECS=(
-    homebrew:setup
-    bash:brew,setup
-    coreutils:brew
-    diffutils:brew
-    git:brew,setup
-    python:brew
-    python@2:brew,setup
-    nmap:brew
-    sass/sass/sass:brew
-    tmux:brew
-    heroku:brew
-    dockutil:brew
-    system:setup
-    terminal:setup
-    finder:setup
-    dock:setup
-    appstore:setup
-    iterm2:cask,setup
-    google-cloud-sdk:cask
-    gpg-suite:cask
-    homebrew/cask-drivers/logitech-options:cask
-    emacs:cask
-    google-chrome:cask
-    marshallofsound-google-play-music-player:cask
-    sketchup-pro:cask
-    whatsapp:cask
-    slack:cask
-    messenger:cask
-    google-chat:cask
-    virtualbox:cask
-    virtualbox-extension-pack:cask
+# For example,
+#     [iterm2]=caskit,init:dotfiles
+# says to install iterm2, run "caskit iterm2", then "init iterm2", but
+# only after processing the "dotfiles" dependency, which must also
+# be defined in the APPSPECS array.
+#
+# Before any apps are processed, "init homebrew" is run.
+# 
+#
+declare -A APPSPECS=(
+    [appstore]=init
+    [bash]=brewit,init
+    [coreutils]=brewit:bash
+    [diffutils]=brewit:bash
+    [dock]=init:dockutil
+    [dockutil]=brewit
+    [dotfiles]=init:git,gpg-suite
+    [emacs]=caskit:dotfiles
+    [finder]=init
+    [git]=brewit:bash
+    [google-chat]=caskit
+    [google-chrome]=caskit
+    [google-cloud-sdk]=caskit:dotfiles
+    [gpg-suite]=caskit
+    [heroku]=brewit
+    [homebrew/cask-drivers/logitech-options]=caskit
+    [iterm2]=caskit,init:dotfiles
+    [marshallofsound-google-play-music-player]=caskit
+    [messenger]=caskit
+    [nmap]=brewit
+    [python2]=brewit
+    [python]=brewit
+    [sass/sass/sass]=brewit
+    [sketchup-pro]=caskit
+    [slack]=caskit
+    [system]=init
+    [terminal]=init:dotfiles
+    [tmux]=brewit
+    [virtualbox-extension-pack]=caskit
+    [virtualbox]=caskit
+    [virtualenvwrapper]=init:python2
+    [whatsapp]=caskit
 )
 
-function setup_homebrew() {
-    
+declare -a APPS=${!APPSPECS[@]}
+
+declare -A RUNSTATUS
+
+function init() {
+    if [[ "${RUNSTATUS[init_$1]}" = "" ]]; then
+        echo init $1
+        init_$1
+        RUNSTATUS[init_$1]="done"
+    fi
+}
+
+function brewit() {
+    if [[ "${RUNSTATUS[brewit_$1]}" = "" ]]; then
+        echo brew install $1
+        brew install $1
+        RUNSTATUS[brewit_$1]="done"
+    fi
+}
+
+function caskit() {
+    if [[ "${RUNSTATUS[caskit_$1]}" = "" ]]; then
+        echo brew cask install $1
+        brew cask install $1
+        RUNSTATUS[caskit_$1]="done"
+    fi
+}
+
+function process_app() {
+    if [[ "${RUNSTATUS[process_$1]}" = "" ]]; then
+        local app=$1
+        local appspec=${APPSPECS[$app]}
+        local cmds=${appspec%%:*}
+        local deps=${appspec##*:}
+        if [[ "$deps" = "$cmds" ]]; then
+            deps=""
+        fi
+
+        for dep in ${deps/,/ }; do
+            process_app $dep
+        done
+
+        for cmd in ${cmds/,/ }; do
+            sudo -v
+            case $cmd in
+                init | brewit | caskit) $cmd $app;;
+                *) echo "Unknown command spec \"${cmd}\" for app ${app}";;
+            esac
+        done
+
+        RUNSTATUS[process_$1]="done"
+    fi
+}
+
+function init_homebrew() {
+    echo "Installing homebrew"
     if [ ! `which brew` ]; then
         /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
     fi
@@ -52,7 +116,7 @@ function setup_homebrew() {
     brew cleanup
 }
 
-function setup_bash() {
+function init_bash() {
 
     # Install 4.x
     brew install bash
@@ -67,17 +131,17 @@ function setup_bash() {
         
 }
 
-function setup_python@2() {
+function init_virtualenvwrapper() {
     pip install --upgrade pip
     pip install virtualenvwrapper
 }
 
-function setup_iterm2() {
+function init_iterm2() {
     cp init/com.googlecode.iterm2.plist ~/Library/Preferences
     chmod 600 ~/Library/Preferences/com.googlecode.iterm2.plist
 }
 
-function setup_system() {
+function init_system() {
     # nvram Preferences:
     # - silent boot (unreliable)
     sudo nvram SystemAudioVolume=" "
@@ -137,7 +201,7 @@ function setup_system() {
     sudo defaults write /Library/Preferences/com.apple.alf globalstate -int 1
 }
 
-function setup_terminal() {
+function init_terminal() {
 
     # flush the plist cache
     killall cfprefsd
@@ -162,7 +226,7 @@ function setup_terminal() {
 
 }
 
-function setup_finder() {
+function init_finder() {
 
     killall cfprefsd
 
@@ -186,7 +250,7 @@ function setup_finder() {
     killall Finder
 }
 
-function setup_dock() {
+function init_dock() {
 
     # Dock Preferences
     # Hot corners:
@@ -227,7 +291,7 @@ function setup_dock() {
     dockutil --remove all
 }
 
-function setup_appstore() {
+function init_appstore() {
 
     # NB: the softwareupdate command below is the only one that seems
     # to have any effect on system settings
@@ -264,7 +328,7 @@ function setup_appstore() {
 
 }
 
-function setup_git() {
+function init_dotfiles() {
 
     if [ ! -d .git ]; then
         git init
@@ -272,45 +336,43 @@ function setup_git() {
         git fetch
         git checkout origin/master --force --track
 
-        . ~/.bash_profile
-
         tar xvf Documents/Keys/ssh.tar
         tar xvf Documents/Keys/gnupg.tar
         tar xvf Documents/Keys/netrc.tar
+        source ~/.bash_profile
     fi
 }
 
-###################################################################
-# Main
-###################################################################
+usage() {
+    echo "Usage: $(basename $0) [-h] [APP]..."
+    echo "       where APP is in ${!APPSPECS[@]}"
+}
+
 while getopts ":hid" opt; do
     case ${opt} in
-        h) lst=$( IFS='|'; echo "Usage: $0 [-h] [${APPSPECS[*]}]"); echo $lst; exit 0
+        h) usage; exit 0
            ;;
-        \?) lst=$( IFS='|'; echo "Usage: $0 [-h] [${APPSPECS[*]}]"); echo $lst; exit 1
+        \?) usage: exit 1
             ;;
-  esac
+    esac
 done
 shift $((OPTIND -1))
 
 # if specified on the command line, only do those setups
 if [ $# -gt 0 ]; then
-    unset APPSPECS
-    APPSPECS=$@
+    for app in $@; do
+        if [[ "${APPSPECS[$app]}" = "" ]]; then
+            echo No recipe for $app
+            usage
+            exit 1
+        fi
+    done
+    unset APPS
+    APPS=$@
 fi
 
 cd ~
-for appspec in ${APPSPECS[@]}; do
-    app=${appspec/:*/}
-    cmds=${appspec/*:/}
-    for cmd in ${cmds/,/ }; do
-        sudo -v
-        case $cmd in
-            brew) brew install $app;;
-            cask) brew cask install $app;;
-            setup) setup_${app};;
-            *) echo "Unknown command spec \"${cmd}\" for app ${app}";;
-        esac
-    done
+init homebrew
+for app in ${APPS[@]}; do
+    process_app $app
 done
-
