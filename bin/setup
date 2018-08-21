@@ -35,6 +35,7 @@ declare -A APPSPECS=(
     [heroku]=brewit
     [homebrew/cask-drivers/logitech-options]=caskit
     [iterm2]=caskit,init:dotfiles
+    [keys]=init
     [marshallofsound-google-play-music-player]=caskit
     [messenger]=caskit
     [nmap]=brewit
@@ -330,7 +331,7 @@ function init_appstore() {
 
 function init_dotfiles() {
 
-    if [ ! -d .git ]; then
+    if [ ! -d init ]; then
         tar xvf Documents/Keys/ssh.tar
         tar xvf Documents/Keys/gnupg.tar
         tar xvf Documents/Keys/netrc.tar
