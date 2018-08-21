@@ -331,14 +331,15 @@ function init_appstore() {
 function init_dotfiles() {
 
     if [ ! -d .git ]; then
+        tar xvf Documents/Keys/ssh.tar
+        tar xvf Documents/Keys/gnupg.tar
+        tar xvf Documents/Keys/netrc.tar
+
         git init
         git remote add origin git@github.com:careyjung/dotfiles.git
         git fetch
         git checkout origin/master --force --track
 
-        tar xvf Documents/Keys/ssh.tar
-        tar xvf Documents/Keys/gnupg.tar
-        tar xvf Documents/Keys/netrc.tar
         source ~/.bash_profile
     fi
 }
