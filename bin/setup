@@ -10,59 +10,68 @@
 #     and each dependency is another APPSPEC key
 #
 declare -A APPSPECS=(
+    [homebrew]=init
     [appstore]=init
     [bash]=init
-    [coreutils]=brewit:bash
-    [diffutils]=brewit:bash
+    [coreutils]=install-brew:bash
+    [diffutils]=install-brew:bash
     [dock]=init:dockutil
-    [dockutil]=brewit
+    [dockutil]=install-brew
     [dotfiles]=init:git,gpg-suite,ssh
-    [emacs]=caskit:dotfiles
+    [emacs]=install-cask:dotfiles
     [finder]=init
-    [git]=brewit:bash
-    [google-chat]=caskit
-    [google-chrome]=caskit
-    [google-cloud-sdk]=caskit:dotfiles
-    [gpg-suite]=caskit,init
-    [heroku]=brewit,init
-    [homebrew/cask-drivers/logitech-options]=caskit
-    [iterm2]=caskit,init:dotfiles
-    [marshallofsound-google-play-music-player]=caskit
-    [messenger]=caskit
-    [nmap]=brewit
-    [python2]=brewit:bash
-    [python]=brewit:bash
-    [sass/sass/sass]=brewit
-    [sketchup-pro]=caskit
-    [slack]=caskit
+    [git]=install-brew:bash
+    [google-chat]=install-cask
+    [google-chrome]=install-cask
+    [google-cloud-sdk]=install-cask:dotfiles
+    [gpg-suite]=install-cask,init
+    [heroku]=install-brew,init
+    [homebrew/cask-drivers/logitech-options]=install-cask
+    [iterm2]=install-cask,init:dotfiles
+    [marshallofsound-google-play-music-player]=install-cask
+    [messenger]=install-cask
+    [nmap]=install-brew
+    [python2]=install-brew:bash
+    [python]=install-brew:bash
+    [sass/sass/sass]=install-brew
+    [sketchup-pro]=install-cask
+    [slack]=install-cask
     [ssh]=init
     [system]=init
     [terminal]=init:dotfiles
-    [tmux]=brewit
-    [virtualbox-extension-pack]=caskit:virtualbox
-    [virtualbox]=caskit
+    [tmux]=install-brew
+    [virtualbox-extension-pack]=install-cask:virtualbox
+    [virtualbox]=install-cask
     [virtualenvwrapper]=init:bash,python,python2
-    [whatsapp]=caskit
+    [whatsapp]=install-cask
 )
 
+# get the keys
 declare -a APPS=${!APPSPECS[@]}
 
+# array used to ensure each app is only processed once
 declare -A RUNONCE
 
+# call the local init_$app function
 function init() {
     init_$1
 }
 
-function brewit() {
-    brew install $1 2>/dev/null
+# call 'brew install $app'
+function install-brew() {
+    brew install $1
 }
 
-function caskit() {
-    brew cask install $1 2>/dev/null
+# call 'brew cask install $app'
+function install-cask() {
+    brew cask install $1
 }
 
+# process each app.
 function process_app() {
+    # only process each app once
     if [[ "${RUNONCE[$1]}" = "" ]]; then
+        # get the list of cmds and deps
         local app=$1
         local appspec=${APPSPECS[$app]}
         local cmds=${appspec%%:*}
@@ -71,14 +80,18 @@ function process_app() {
             deps=""
         fi
 
+        # process dependencies recursively before this app is processed
         for dep in ${deps//,/ }; do
             process_app $dep
         done
 
+        # run the list of commands on this app. Only 3 possibilities
+        # allowed: init, install-brew, and install-cask
         for cmd in ${cmds//,/ }; do
             case $cmd in
-                init | brewit | caskit)
-                    echo $cmd $app
+                init | install-brew | install-cask)
+                    sudo -v
+                    echo -e "\033[0;31m==> ${cmd} ${app}\033[0m"
                     $cmd $app
                     ;;
                 *) echo "Unknown command spec \"${cmd}\" for app ${app}"
@@ -311,7 +324,6 @@ function init_appstore() {
          AutoUpdateRestartRequired -bool true
 
     sudo softwareupdate --schedule on
-
 }
 
 function init_dotfiles() {
@@ -355,7 +367,7 @@ if [ $# -gt 0 ]; then
 fi
 
 cd ~
-init homebrew
+process_app homebrew
 for app in ${APPS[@]}; do
     process_app $app
 done
