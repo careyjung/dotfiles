@@ -39,7 +39,7 @@ declare -A APPSPECS=(
     [system]=init
     [terminal]=init:dotfiles
     [tmux]=brewit
-    [virtualbox-extension-pack]=caskit
+    [virtualbox-extension-pack]=caskit:virtualbox
     [virtualbox]=caskit
     [virtualenvwrapper]=init:bash,python,python2
     [whatsapp]=caskit
@@ -77,8 +77,12 @@ function process_app() {
 
         for cmd in ${cmds//,/ }; do
             case $cmd in
-                init | brewit | caskit) $cmd $app;;
-                *) echo "Unknown command spec \"${cmd}\" for app ${app}";;
+                init | brewit | caskit)
+                    echo $cmd $app
+                    $cmd $app
+                    ;;
+                *) echo "Unknown command spec \"${cmd}\" for app ${app}"
+                   ;;
             esac
         done
 
