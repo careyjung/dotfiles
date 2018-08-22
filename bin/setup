@@ -54,11 +54,11 @@ function init() {
 }
 
 function brewit() {
-    brew install $1
+    brew install $1 2>/dev/null
 }
 
 function caskit() {
-    brew cask install $1
+    brew cask install $1 2>/dev/null
 }
 
 function process_app() {
