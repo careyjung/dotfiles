@@ -1,25 +1,17 @@
-#!/usr/bin/env bash
+#!/usr/local/bin/bash
 
 #
 # Add apps or initialization functions here.
 #   * Order is irrelevant, assuming dependencies are properly defined
 #   * Array keys are either homebrew apps or casks or locally
 #     defined init_$app functions.
-#   * Syntax for specs is "<commands>:<dependencies",
-#     where a command is a function taking one argument, the appname
-#
-# For example,
-#     [iterm2]=caskit,init:dotfiles
-# says to install iterm2, run "caskit iterm2", then "init iterm2", but
-# only after processing the "dotfiles" dependency, which must also
-# be defined in the APPSPECS array.
-#
-# Before any apps are processed, "init homebrew" is run.
-# 
+#   * Syntax for specs is "command1,command2,...:dependency1,dependency2,..."
+#     where each command is a function taking one argument, the app name,
+#     and each dependency is another APPSPEC key
 #
 declare -A APPSPECS=(
     [appstore]=init
-    [bash]=brewit,init
+    [bash]=init
     [coreutils]=brewit:bash
     [diffutils]=brewit:bash
     [dock]=init:dockutil
@@ -35,54 +27,42 @@ declare -A APPSPECS=(
     [heroku]=brewit,init
     [homebrew/cask-drivers/logitech-options]=caskit
     [iterm2]=caskit,init:dotfiles
-    [ssh]=init
     [marshallofsound-google-play-music-player]=caskit
     [messenger]=caskit
     [nmap]=brewit
-    [python2]=brewit
-    [python]=brewit
+    [python2]=brewit:bash
+    [python]=brewit:bash
     [sass/sass/sass]=brewit
     [sketchup-pro]=caskit
     [slack]=caskit
+    [ssh]=init
     [system]=init
     [terminal]=init:dotfiles
     [tmux]=brewit
     [virtualbox-extension-pack]=caskit
     [virtualbox]=caskit
-    [virtualenvwrapper]=init:python2
+    [virtualenvwrapper]=init:bash,python,python2
     [whatsapp]=caskit
 )
 
 declare -a APPS=${!APPSPECS[@]}
 
-declare -A RUNSTATUS
+declare -A RUNONCE
 
 function init() {
-    if [[ "${RUNSTATUS[init_$1]}" = "" ]]; then
-        echo init $1
-        init_$1
-        RUNSTATUS[init_$1]="done"
-    fi
+    init_$1
 }
 
 function brewit() {
-    if [[ "${RUNSTATUS[brewit_$1]}" = "" ]]; then
-        echo brew install $1
-        brew install $1
-        RUNSTATUS[brewit_$1]="done"
-    fi
+    brew install $1
 }
 
 function caskit() {
-    if [[ "${RUNSTATUS[caskit_$1]}" = "" ]]; then
-        echo brew cask install $1
-        brew cask install $1
-        RUNSTATUS[caskit_$1]="done"
-    fi
+    brew cask install $1
 }
 
 function process_app() {
-    if [[ "${RUNSTATUS[process_$1]}" = "" ]]; then
+    if [[ "${RUNONCE[$1]}" = "" ]]; then
         local app=$1
         local appspec=${APPSPECS[$app]}
         local cmds=${appspec%%:*}
@@ -91,19 +71,18 @@ function process_app() {
             deps=""
         fi
 
-        for dep in ${deps/,/ }; do
+        for dep in ${deps//,/ }; do
             process_app $dep
         done
 
-        for cmd in ${cmds/,/ }; do
-            sudo -v
+        for cmd in ${cmds//,/ }; do
             case $cmd in
                 init | brewit | caskit) $cmd $app;;
                 *) echo "Unknown command spec \"${cmd}\" for app ${app}";;
             esac
         done
 
-        RUNSTATUS[process_$1]="done"
+        RUNONCE[$1]="done"
     fi
 }
 
@@ -120,28 +99,18 @@ function init_gpg-suite() {
 }
 
 function init_homebrew() {
-    echo "Installing homebrew"
-    if [ ! `which brew` ]; then
-        /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
-    fi
     brew update
     brew upgrade
     brew cleanup
 }
 
 function init_bash() {
-
-    # Install 4.x
-    brew install bash
-
-    # add it to shells
     if ! fgrep -q '/usr/local/bin/bash' /etc/shells; then
         echo '/usr/local/bin/bash' | sudo tee -a /etc/shells
     fi
     if [ $SHELL != '/usr/local/bin/bash' ]; then
         sudo chsh -s /usr/local/bin/bash $(whoami)
     fi
-        
 }
 
 function init_virtualenvwrapper() {

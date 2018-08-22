@@ -1,5 +1,8 @@
-#!/usr/bin/env bash
+#!/bin/bash
 
+# Note: we assume a clean install, so /bin/bash (version 3), but
+# setup script requires bash 4, so we have to install it
+#
 /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
 brew install bash
-curl -fsSL https://raw.githubusercontent.com/careyjung/dotfiles/master/bin/setup|bash
+curl -fsSL https://raw.githubusercontent.com/careyjung/dotfiles/master/bin/setup|/usr/local/bin/bash
