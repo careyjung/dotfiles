@@ -87,15 +87,15 @@ function process_app() {
 }
 
 function init_ssh() {
-    test -d .ssh || tar xvf Documents/Keys/ssh.tar
+    test -d ~/.ssh || tar xvf Documents/Keys/ssh.tar
 }
 
 function init_heroku() {
-    test -f .netrc || tar xvf Documents/Keys/netrc.tar
+    test -f ~/.netrc || tar xvf Documents/Keys/netrc.tar
 }
 
 function init_gpg-suite() {
-    test -d .gnupg || tar xvf Documents/Keys/gnupg.tar
+    test -d ~/.gnupg || tar xvf Documents/Keys/gnupg.tar
 }
 
 function init_homebrew() {
