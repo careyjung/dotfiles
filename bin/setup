@@ -114,7 +114,7 @@ function process_app() {
 
                     if [[ "$DRYRUN" != "true" ]]; then
                         sudo -v
-                        $1 $2
+                        $cmd $app
                     fi
                     if [[ "$STEP" = "true" ]]; then
                         read -p "Press any key to continue..."
