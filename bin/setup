@@ -1,49 +1,58 @@
 #!/usr/local/bin/bash
 
-#
-# Add apps or initialization functions here.
-#   * Order is irrelevant, assuming dependencies are properly defined
-#   * Array keys are either homebrew apps or casks or locally
-#     defined init_$app functions.
-#   * Syntax for specs is "command1,command2,...:dependency1,dependency2,..."
-#     where each command is a function taking one argument, the app name,
-#     and each dependency is another APPSPEC key
+# To add an app to the setup, add it to APPSPECS. Syntax for an app spec is
+#	[appname]=prereq1,prereq2,...:command1,command2,...
+#	where
+#	* appname = a homebrew brew or cask, or other app
+#	* prereqN = a prerequisite app in APPSPECS
+#	* command1 = an install command taking one parameter.
+#	  Valid commands are currently:
+#	  'brew-install' (invokes 'brew install $appname')
+#	  'cask-install' (invokes 'brew cask install $appname')
+#	  'init' (invokes init_$appname, which must be locally defined)
+#	Colon (":") is optional; if not present, everything is a command
 #
 declare -A APPSPECS=(
+    [core]=homebrew,bash,git,dotfiles:
     [homebrew]=init
+    [bash]=homebrew:init
+    [git]=homebrew:brew-install
+    [dotfiles]=git:init
+
+    [tools]=core,gpg-suite,ssh,coreutils,diffutils,heroku,iterm2,nmap,tmux,sass/sass/sass:
+    [gpg-suite]=core:cask-install,init
+    [ssh]=core:init
+    [coreutils]=core:brew-install
+    [diffutils]=core:brew-install
+    [google-cloud-sdk]=core:cask-install
+    [heroku]=brew-install,init
+    [iterm2]=core:cask-install,init
+    [nmap]=brew-install
+    [sass/sass/sass]=brew-install
+    [tmux]=dotfiles:brew-install
+
+    [python2]=core:brew-install
+    [python]=core:brew-install
+
     [appstore]=init
-    [bash]=init
-    [coreutils]=install-brew:bash
-    [diffutils]=install-brew:bash
-    [dock]=init:dockutil
-    [dockutil]=install-brew
-    [dotfiles]=init:git,gpg-suite,ssh
-    [emacs]=install-cask:dotfiles
-    [finder]=init
-    [git]=install-brew:bash
-    [google-chat]=install-cask
-    [google-chrome]=install-cask
-    [google-cloud-sdk]=install-cask:dotfiles
-    [gpg-suite]=install-cask,init
-    [heroku]=install-brew,init
-    [homebrew/cask-drivers/logitech-options]=install-cask
-    [iterm2]=install-cask,init:dotfiles
-    [marshallofsound-google-play-music-player]=install-cask
-    [messenger]=install-cask
-    [nmap]=install-brew
-    [python2]=install-brew:bash
-    [python]=install-brew:bash
-    [sass/sass/sass]=install-brew
-    [sketchup-pro]=install-cask
-    [slack]=install-cask
-    [ssh]=init
+    [dockutil]=brew-install
+    [dock]=dockutil:init
+    [finder]=core:init
     [system]=init
-    [terminal]=init:dotfiles
-    [tmux]=install-brew
-    [virtualbox-extension-pack]=install-cask:virtualbox
-    [virtualbox]=install-cask
-    [virtualenvwrapper]=init:bash,python,python2
-    [whatsapp]=install-cask
+    [terminal]=dotfiles:init
+
+    [emacs]=dotfiles:cask-install
+    [google-chat]=cask-install
+    [google-chrome]=cask-install
+    [homebrew/cask-drivers/logitech-options]=cask-install
+    [marshallofsound-google-play-music-player]=cask-install
+    [messenger]=cask-install
+    [sketchup-pro]=cask-install
+    [slack]=cask-install
+    [virtualbox-extension-pack]=virtualbox:cask-install
+    [virtualbox]=cask-install
+    [virtualenvwrapper]=python,python2:init
+    [whatsapp]=cask-install
 )
 
 # get the keys
@@ -58,41 +67,58 @@ function init() {
 }
 
 # call 'brew install $app'
-function install-brew() {
+function brew-install() {
     brew install $1
 }
 
 # call 'brew cask install $app'
-function install-cask() {
+function cask-install() {
     brew cask install $1
+}
+
+# -n option sets DRYRUN to true
+declare DRYRUN
+function run() {
+    if [[ "$DRYRUN" != "true" ]]; then
+        sudo -v
+        $1 $2
+    fi
 }
 
 # process each app.
 function process_app() {
     # only process each app once
     if [[ "${RUNONCE[$1]}" = "" ]]; then
-        # get the list of cmds and deps
+        # get the list of prereqs and commands
+        # format is "prereq,prereq,...:command,command,..."
+        # colon is optional; if missing, no prereqs are assumed
         local app=$1
         local appspec=${APPSPECS[$app]}
-        local cmds=${appspec%%:*}
-        local deps=${appspec##*:}
-        if [[ "$deps" = "$cmds" ]]; then
-            deps=""
+        local prereqs=${appspec%%:*}
+        local commands=${appspec##*:}
+        if [[ "$prereqs" = "$commands" ]]; then
+            prereqs=""
         fi
 
         # process dependencies recursively before this app is processed
-        for dep in ${deps//,/ }; do
-            process_app $dep
+        for prereq in ${prereqs//,/ }; do
+            process_app $prereq
         done
 
         # run the list of commands on this app. Only 3 possibilities
-        # allowed: init, install-brew, and install-cask
-        for cmd in ${cmds//,/ }; do
+        # allowed: init, brew-install, and cask-install
+        for cmd in ${commands//,/ }; do
             case $cmd in
-                init | install-brew | install-cask)
-                    sudo -v
-                    echo -e "\033[0;31m==> ${cmd} ${app}\033[0m"
-                    $cmd $app
+                init | brew-install | cask-install)
+                    echo -e "\033[0;31m${cmd} ${app}\033[0m"
+
+                    if [[ "$DRYRUN" != "true" ]]; then
+                        sudo -v
+                        $1 $2
+                    fi
+                    if [[ "$STEP" = "true" ]]; then
+                        read -p "Press any key to continue..."
+                    fi
                     ;;
                 *) echo "Unknown command spec \"${cmd}\" for app ${app}"
                    ;;
@@ -339,13 +365,19 @@ function init_dotfiles() {
 }
 
 usage() {
-    echo "Usage: $(basename $0) [-h] [APP]..."
-    echo "       where APP is in ${!APPSPECS[@]}"
+    echo "Usage: $(basename $0) [-h] [-n] [APP]..."
+    echo "	-h: print this usage message and exit"
+    echo "	-n: dryrun. Print, but do not run commands"
+    echo "      APP is in ${!APPSPECS[@]}"
 }
 
-while getopts ":hid" opt; do
+while getopts "hns" opt; do
     case ${opt} in
         h) usage; exit 0
+           ;;
+        n) DRYRUN=true
+           ;;
+        s) STEP=true
            ;;
         \?) usage: exit 1
             ;;
