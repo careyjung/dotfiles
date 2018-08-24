@@ -24,6 +24,7 @@ Library/
 # ignore everything else
 .bash_history
 .bash_sessions/
+.config/gcloud
 .config/hub
 .cups/
 .gem/

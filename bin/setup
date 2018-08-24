@@ -215,7 +215,7 @@ function init_system() {
     killall SystemUIServer
     
     # General Preferences: preserve windows when closing an app
-    defaults write NSGlobalDomain NSQuitAlwaysKeepsWindows -boolean true
+    # defaults write NSGlobalDomain NSQuitAlwaysKeepsWindows -boolean true
 
     # General tab: use dark menu bar and dock
     defaults write NSGlobalDomain AppleInterfaceStyle -string Dark
