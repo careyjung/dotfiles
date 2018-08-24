@@ -13,15 +13,14 @@
 #	Colon (":") is optional; if not present, everything is a command
 #
 declare -A APPSPECS=(
-    [core]=homebrew,bash,git,gpg-suite,dotfiles:
+    [core]=homebrew,bash,git,ssh,dotfiles:
     [homebrew]=init
     [bash]=homebrew:init
     [git]=homebrew:brew-install
-    [gpg-suite]=homebrew:cask-install,init
+    [ssh]=init
     [dotfiles]=git:init
 
-    [tools]=core,gpg-suite,ssh,coreutils,diffutils,heroku,iterm2,nmap,tmux,sass/sass/sass:
-    [ssh]=core:init
+    [gpg-suite]=homebrew:cask-install,init
     [coreutils]=core:brew-install
     [diffutils]=core:brew-install
     [google-cloud-sdk]=core:cask-install
