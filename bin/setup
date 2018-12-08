@@ -52,6 +52,7 @@ declare -A APPSPECS=(
     [virtualbox]=cask-install
     [virtualenvwrapper]=python,python2:init
     [whatsapp]=cask-install
+    [kindle]=cask-install
 )
 
 # get the keys
