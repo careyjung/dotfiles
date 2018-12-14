@@ -33,3 +33,5 @@ export WORKON_HOME=$HOME/Documents/virtualenvs
 export PROJECT_HOME=$HOME/Documents/projects
 export VIRTUALENVWRAPPER_WORKON_CD=1
 test -f /usr/local/bin/virtualenvwrapper.sh && source /usr/local/bin/virtualenvwrapper.sh
+
+which rbenv >/dev/null 2>&1 && eval "$(rbenv init -)"

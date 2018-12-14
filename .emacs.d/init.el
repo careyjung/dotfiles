@@ -166,6 +166,10 @@
 ;;
 (global-set-key (kbd "C-c C-v") 'browse-url-of-file)
 
+;; turn off bell (only need one of these)
+(setq visible-bell nil)
+;(setq ring-bell-function 'ignore)
+
 ;; init.el ends here
 
 (custom-set-variables

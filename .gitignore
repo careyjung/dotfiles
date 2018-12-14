@@ -21,6 +21,11 @@
 Library/
 !Library/Preferences/com.googlecode.iterm2.plist
 
+# ruby crap
+.bundle/
+.subversion/
+.rbenv/
+
 # ignore everything else
 .bash_history
 .bash_sessions/
