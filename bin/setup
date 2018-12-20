@@ -45,8 +45,7 @@ declare -A APPSPECS=(
     [emacs]=dotfiles:cask-install
     [google-chat]=cask-install
     [google-chrome]=cask-install
-    [homebrew/cask-drivers/logitech-options]=cask-install
-    [marshallofsound-google-play-music-player]=cask-install
+    [logitech-options]=cask-install
     [messenger]=cask-install
     [sketchup-pro]=cask-install
     [slack]=cask-install
@@ -55,6 +54,7 @@ declare -A APPSPECS=(
     [virtualenvwrapper]=python,python2:init
     [whatsapp]=cask-install
     [kindle]=cask-install
+    [microsoft-office]=cask-install
 )
 
 # get the keys

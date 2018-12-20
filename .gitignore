@@ -42,6 +42,7 @@ Library/
 .vagrant.d/
 .vim/.netrwhist
 .viminfo
+.zoomus/
 Applications/
 Desktop/
 Documents/
