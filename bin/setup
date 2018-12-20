@@ -29,6 +29,7 @@ declare -A APPSPECS=(
     [nmap]=brew-install
     [sass/sass/sass]=brew-install
     [tmux]=dotfiles:brew-install
+    [speedtest-cli]=dotfiles:brew-install
 
     [python2]=core:brew-install
     [python]=core:brew-install
