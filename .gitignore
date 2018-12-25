@@ -41,6 +41,7 @@ Library/
 .python_history
 .vagrant.d/
 .pylint.d/
+.vscode/
 .vim/.netrwhist
 .viminfo
 .zoomus/
