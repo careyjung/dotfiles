@@ -40,6 +40,7 @@ Library/
 .netrc
 .python_history
 .vagrant.d/
+.pylint.d/
 .vim/.netrwhist
 .viminfo
 Applications/
