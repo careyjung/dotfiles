@@ -47,7 +47,6 @@ declare -A APPSPECS=(
     [google-chat]=cask-install
     [google-chrome]=cask-install
     [logitech-options]=cask-install
-    [messenger]=cask-install
     [sketchup-pro]=cask-install
     [slack]=cask-install
     [virtualbox-extension-pack]=virtualbox:cask-install
