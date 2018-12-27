@@ -56,6 +56,7 @@ declare -A APPSPECS=(
     [whatsapp]=cask-install
     [kindle]=cask-install
     [microsoft-office]=cask-install
+    [evernote]=cask-install
 )
 
 # get the keys
