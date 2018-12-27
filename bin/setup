@@ -47,7 +47,6 @@ declare -A APPSPECS=(
     [google-chat]=cask-install
     [google-chrome]=cask-install
     [logitech-options]=cask-install
-    [messenger]=cask-install
     [sketchup-pro]=cask-install
     [slack]=cask-install
     [virtualbox-extension-pack]=virtualbox:cask-install
@@ -55,8 +54,9 @@ declare -A APPSPECS=(
     [virtualenvwrapper]=python,python2:init
     [whatsapp]=cask-install
     [kindle]=cask-install
-    [microsoft-office]=cask-install
-    [evernote]=cask-install
+    [evernote]=dotfiles:cask-install
+    [visual-studio-code]=dotfiles:cask-install
+    [microsoft-office]=dotfiles:cask-install
 )
 
 # get the keys
