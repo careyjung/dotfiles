@@ -54,7 +54,6 @@ declare -A APPSPECS=(
     [virtualenvwrapper]=python,python2:init
     [whatsapp]=cask-install
     [kindle]=cask-install
-    [evernote]=dotfiles:cask-install
     [visual-studio-code]=dotfiles:cask-install
     [microsoft-office]=dotfiles:cask-install
 )
