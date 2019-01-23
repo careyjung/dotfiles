@@ -57,6 +57,7 @@ declare -A APPSPECS=(
     [evernote]=dotfiles:cask-install
     [visual-studio-code]=dotfiles:cask-install
     [microsoft-office]=dotfiles:cask-install
+    [mailplane]=dotfiles:cask-install
 )
 
 # get the keys
